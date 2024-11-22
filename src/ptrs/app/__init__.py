@@ -6,13 +6,36 @@ all code in this module will be run automatically.
 """
 
 NEWPOTHOLEINFO = {
-    "address": "",
-    "lattitude": 0,
     "longitude": 0,
+    "lattitude": 0,
+    "address": "",
     "size": 0,
     "location": "",
     "other": "",
 }
+
+POTHOLES = [
+    {
+        "longitude": -79.14330656640881,
+        "lattitude": 40.61788300526618,
+        "address": "East Locust Street, Indiana, PA 15701",
+    },
+    {
+        "longitude": -79.15567480668099,
+        "lattitude": 40.616057738540064,
+        "address": "849 Grant Street, Indiana, PA 15701",
+    },
+    {
+        "longitude": -79.16833557394808,
+        "lattitude": 40.62060286129906,
+        "address": "202 South 14th Street, Indiana, PA 15701",
+    },
+    {
+        "longitude": -79.16043114570603,
+        "lattitude": 40.625764114281935,
+        "address": "1096 Oak Street, Indiana, PA 15701",
+    },
+]
 
 
 def create_app():
@@ -30,11 +53,14 @@ def create_app():
             NEWPOTHOLEINFO["other"] = request.form.get("other")
         return render_template("pothole.html")
 
-    @app.route("/addressUpdate", methods=["POST"])
+    @app.route("/data", methods=["GET", "POST"])
     def process_data():
-        NEWPOTHOLEINFO["address"] = request.json["address"]
-        NEWPOTHOLEINFO["lattitude"] = request.json["lattitude"]
-        NEWPOTHOLEINFO["longitude"] = request.json["longitude"]
-        return "success"
+        if request.method == "POST":
+            NEWPOTHOLEINFO["longitude"] = request.json["longitude"]
+            NEWPOTHOLEINFO["lattitude"] = request.json["lattitude"]
+            NEWPOTHOLEINFO["address"] = request.json["address"]
+            return "success"
+        elif request.method == "GET":
+            return POTHOLES
 
     return app
