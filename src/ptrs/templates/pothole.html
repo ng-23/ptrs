@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PTRS</title>
+		<script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.3.0/maptiler-sdk.umd.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}" />
+		<link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.3.0/maptiler-sdk.css" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="gridContainer">
+			<div class="card mapCard">
+				<div id="map"></div>
+			</div>
+			<div class="card submitCard">
+				<form action="{{ url_for('pothole') }}" method="post">
+					<div class="formRow">
+						<h1>New Report</h1>
+					</div>
+					<div class="formRow">
+						<label for="address"> Street Address: </label>
+						<span id="address" name="address">None Selected</span>
+					</div>
+					<div class="formRow">
+						<label for="size"> Size: </label>
+						<input type="range" id="size" name="size"></input>
+					</div>
+					<div class="formRow">
+						<label for="location"> Location In the Street: </label>
+						<input type="text" id="location" name="location" placeholder="Type Here" />
+					</div>
+					<div class="formRow">
+						<label for="other"> Other Necessary Information: </label><br />
+						<textarea id="other" name="other" placeholder="Type Here"></textarea>
+					</div>
+					<div class="formRow">
+						<input type="submit" value="Submit" />
+					</div>
+				</form>
+			</div>
+			<div class="card mapHelpCard">
+				<p class="mapHelpText">
+					Click on the map to place a <span style="color: red">red</span> pin for a new report. <br />
+					Click on a <span style="color: blue">blue</span> pin on the map to view a reported pothole.
+				</p>
+			</div>
+			<div class="card viewCard"></div>
+		</div>
+		<script type="module" src="{{ url_for('static', filename='map.js') }}"></script>
+	</body>
+</html>
