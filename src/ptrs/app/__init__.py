@@ -9,7 +9,7 @@ def create_app():
     app = Flask(__name__)
 
     @app.route('/about')
-    def hello():
+    def about():
         return 'Pothole Tracking and Repair System (PTRS)'
     
     return app
