@@ -1,33 +1,4 @@
-maptilersdk.config.apiKey = "X6QXRw7moQwVgb7tbcCO";
-const mapMarker = new maptilersdk.Marker({ color: "#ff0000" });
-const markerGPS = { longitude: null, latitude: null, address: null };
-const map = new maptilersdk.Map({
-	container: "map",
-	style: maptilersdk.MapStyle.STREETS,
-	center: [-79.1525, 40.6215],
-	zoom: 12,
-	minZoom: 12,
-	maxZoom: 18,
-});
-
-fetch("http://127.0.0.1:5000/data", {
-	method: "GET",
-	headers: {
-		"Content-Type": "application/json",
-	},
-})
-	.then((response) => response.text())
-	.then((data) => {
-		for (let pothole of JSON.parse(data)) {
-			let marker = new maptilersdk.Marker({ color: "#0000ff" });
-			marker.setLngLat([pothole.longitude, pothole.latitude]).addTo(map);
-		}
-	})
-	.catch((error) => {
-		console.error("Error:", error);
-	});
-
-map.on("click", async function (e) {
+/*map.on("click", function (e) {
 	[markerGPS.longitude, markerGPS.latitude] = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
 	mapMarker.setLngLat([markerGPS.longitude, markerGPS.latitude]).addTo(map);
 	let url = `https://api.geoapify.com/v1/geocode/reverse?lat=${markerGPS.latitude}&lon=${markerGPS.longitude}&apiKey=cae0e983bd184089b8f89641f5538ee8`;
@@ -50,4 +21,44 @@ map.on("click", async function (e) {
 					console.error("Error:", error);
 				});
 		});
-});
+});*/
+
+
+async function initMap() {
+	const { Map } = await google.maps.importLibrary("maps");
+	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+		"marker",
+	);
+	const myLatLng = {lng: -79.1525, lat: 40.6215};
+	const map = new Map(document.getElementById("map"), {
+		center: myLatLng,
+		zoom: 12,
+		mapId: "c894f5bb0ee453ef",
+	})
+	fetch("http://127.0.0.1:5000/data", {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	})
+		.then((response) => response.text())
+		.then((data) => {
+			for (let pothole of JSON.parse(data)) {
+				const pinBlue = new PinElement({
+					background: "#0000ff",
+					borderColor: "#0000ff",
+					glyphColor: "white",
+				});
+				new AdvancedMarkerElement({
+					map,
+					position: {lng: pothole.longitude, lat: pothole.latitude},
+					content: pinBlue.element,
+				});
+			}
+		})
+		.catch((error) => {
+			console.error("Error:", error);
+		});
+}
+
+window.initMap = initMap;
