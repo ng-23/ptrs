@@ -1,16 +1,26 @@
 async function initMap() {
 	const { Map } = await google.maps.importLibrary("maps");
 	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-	const myLatLng = { lng: -79.1525, lat: 40.6215 };
+	const myLatLng = { lat: 40.6215, lng: -79.1525 };
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
 		zoom: 12,
+		minZoom: 12,
+		maxZoom: 18,
 		mapId: "c894f5bb0ee453ef",
+		mapTypeControl: false,
+		streetViewControl: false,
+		fullscreenControl: false,
+	});
+	const pinRed = new PinElement({
+		background: "#ff0000",
+		borderColor: "#990f02",
+		glyphColor: "white",
 	});
 	const marker = new AdvancedMarkerElement({
 		map,
 		position: myLatLng,
-		title: 'Uluru',
+		content: pinRed.element,
 	});
 
 	map.addListener("click", (e) => {
@@ -51,13 +61,17 @@ async function initMap() {
 			for (let pothole of JSON.parse(data)) {
 				const pinBlue = new PinElement({
 					background: "#0000ff",
-					borderColor: "#0000ff",
+					borderColor: "#051094",
 					glyphColor: "white",
 				});
-				new AdvancedMarkerElement({
+				const previousReport = new AdvancedMarkerElement({
 					map,
-					position: {lng: pothole.longitude, lat: pothole.latitude},
+					position: { lat: pothole.latitude, lng: pothole.longitude },
 					content: pinBlue.element,
+				});
+				previousReport.addListener("click", () => {
+					map.setZoom(18);
+					map.setCenter(previousReport.position);
 				});
 			}
 		})
