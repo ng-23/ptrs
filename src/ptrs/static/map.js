@@ -43,7 +43,7 @@ map.on("click", async function (e) {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ address: markerGPS.address, latitude: markerGPS.lattitude, longitude: markerGPS.longitude }),
+				body: JSON.stringify({ address: markerGPS.address, latitude: markerGPS.latitude, longitude: markerGPS.longitude }),
 			})
 				.then((response) => response.text())
 				.catch((error) => {
