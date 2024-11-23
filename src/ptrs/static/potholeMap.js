@@ -1,16 +1,17 @@
 async function initMap() {
 	const { Map } = await google.maps.importLibrary("maps");
 	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+	const geocoder = new google.maps.Geocoder();
 	const myLatLng = { lat: 40.6215, lng: -79.1525 };
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
-		zoom: 12,
-		minZoom: 12,
+		zoom: 15,
+		minZoom: 15,
 		maxZoom: 18,
 		mapId: "c894f5bb0ee453ef",
-		mapTypeControl: false,
-		streetViewControl: false,
-		fullscreenControl: false,
+		disableDefaultUI: true,
+		zoomControl: true,
+		clickableIcons: false,
 	});
 	const pinRed = new PinElement({
 		background: "#ff0000",
@@ -19,21 +20,18 @@ async function initMap() {
 	});
 	const marker = new AdvancedMarkerElement({
 		map,
-		position: myLatLng,
 		content: pinRed.element,
 	});
+
 
 	map.addListener("click", (e) => {
 		let latitude = e.latLng.lat();
 		let longitude = e.latLng.lng();
 		marker.position = { lat: latitude, lng: longitude };
 
-		let url = `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&apiKey=cae0e983bd184089b8f89641f5538ee8`;
-
-		fetch(url)
-			.then((result) => result.json())
-			.then((featureCollection) => {
-				let address = featureCollection.features[0].properties.formatted.replace(", United States of America", "");
+		geocoder.geocode({ location: e.latLng })
+			.then((response) => {
+				let address = response.results[0].formatted_address.replace(", USA", "");
 				document.querySelector("#address").innerHTML = address;
 
 				fetch("http://127.0.0.1:5000/data", {
@@ -69,9 +67,25 @@ async function initMap() {
 					position: { lat: pothole.latitude, lng: pothole.longitude },
 					content: pinBlue.element,
 				});
+				previousReport.address = pothole.address;
+				previousReport.size = pothole.size;
+				previousReport.other = pothole.other;
+				previousReport.repairStatus = pothole.repairStatus;
+				previousReport.reportDate = pothole.reportDate;
+				previousReport.expectedCompletion = pothole.expectedCompletion;
 				previousReport.addListener("click", () => {
 					map.setZoom(18);
 					map.setCenter(previousReport.position);
+					document.querySelector(".viewLabel.address").innerHTML = "Street Address:";
+					document.querySelector(".viewDescription.address").innerHTML = previousReport.address;
+					document.querySelector(".viewLabel.size").innerHTML = "Size:";
+					document.querySelector(".viewDescription.size").innerHTML = previousReport.size;
+					document.querySelector(".viewLabel.repairStatus").innerHTML = "Repair Status:";
+					document.querySelector(".viewDescription.repairStatus").innerHTML = previousReport.repairStatus;
+					document.querySelector(".viewLabel.reportDate").innerHTML = "Report Date:";
+					document.querySelector(".viewDescription.reportDate").innerHTML = previousReport.reportDate;
+					document.querySelector(".viewLabel.expectedCompletion").innerHTML = "Expected Completion Date:";
+					document.querySelector(".viewDescription.expectedCompletion").innerHTML = previousReport.expectedCompletion;
 				});
 			}
 		})

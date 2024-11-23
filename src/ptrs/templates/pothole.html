@@ -46,9 +46,20 @@
 	</div>
 	<div class="card viewCard">
 		<h1>Selected Report</h1>
+		<span class="viewLabel address"></span>
+		<span class="viewDescription address"></span>
+		<span class="viewLabel size"></span>
+		<span class="viewDescription size"></span>
+		<span class="viewLabel repairStatus"></span>
+		<span class="viewDescription repairStatus"></span>
+		<span class="viewLabel reportDate"></span>
+		<span class="viewDescription reportDate"></span>
+		<span class="viewLabel expectedCompletion"></span>
+		<span class="viewDescription expectedCompletion"></span>
+	</div>
 	</div>
 </div>
 <script type="module" src="{{ url_for('static', filename='potholeMap.js') }}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs_wMRGpPPb74zD4Qf7FI_nE4cTR4JINw&callback=initMap&v=weekly" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs_wMRGpPPb74zD4Qf7FI_nE4cTR4JINw&loading=async&callback=initMap&v=weekly" defer></script>
 </body>
 </html>
