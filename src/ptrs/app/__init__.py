@@ -7,7 +7,7 @@ all code in this module will be run automatically.
 
 NEWPOTHOLEINFO = {
     "longitude": 0,
-    "lattitude": 0,
+    "latitude": 0,
     "address": "",
     "size": 0,
     "location": "",
@@ -17,23 +17,47 @@ NEWPOTHOLEINFO = {
 POTHOLES = [
     {
         "longitude": -79.14330656640881,
-        "lattitude": 40.61788300526618,
+        "latitude": 40.61788300526618,
         "address": "East Locust Street, Indiana, PA 15701",
+        "size": 5,
+        "location": "Turning lane",
+        "other": "",
+        "repairStatus": "Not Repaired",
+        "reportDate": "11:39AM on October 26th 2024",
+        "expectedCompletion": "October 28th 2024",
     },
     {
         "longitude": -79.15567480668099,
-        "lattitude": 40.616057738540064,
+        "latitude": 40.616057738540064,
         "address": "849 Grant Street, Indiana, PA 15701",
+        "size": 8,
+        "location": "By parking",
+        "other": "",
+        "repairStatus": "Not Repaired",
+        "reportDate": "7:23PM on October 26th 2024",
+        "expectedCompletion": "October 28th 2024",
     },
     {
         "longitude": -79.16833557394808,
-        "lattitude": 40.62060286129906,
+        "latitude": 40.62060286129906,
         "address": "202 South 14th Street, Indiana, PA 15701",
+        "size": 2,
+        "location": "",
+        "other": "",
+        "repairStatus": "Not Repaired",
+        "reportDate": "12:05AM on October 27th 2024",
+        "expectedCompletion": "October 28th 2024",
     },
     {
         "longitude": -79.16043114570603,
-        "lattitude": 40.625764114281935,
+        "latitude": 40.625764114281935,
         "address": "1096 Oak Street, Indiana, PA 15701",
+        "size": 7,
+        "location": "",
+        "other": "",
+        "repairStatus": "Not Repaired",
+        "reportDate": "5:17PM on October 27th 2024",
+        "expectedCompletion": "October 28th 2024",
     },
 ]
 
@@ -57,7 +81,7 @@ def create_app():
     def process_data():
         if request.method == "POST":
             NEWPOTHOLEINFO["longitude"] = request.json["longitude"]
-            NEWPOTHOLEINFO["lattitude"] = request.json["lattitude"]
+            NEWPOTHOLEINFO["latitude"] = request.json["latitude"]
             NEWPOTHOLEINFO["address"] = request.json["address"]
             return "success"
         elif request.method == "GET":

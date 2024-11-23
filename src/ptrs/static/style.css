@@ -3,7 +3,7 @@
 html,
 body {
 	height: 100%;
-	margin: 0px;
+	margin: 0;
 }
 
 body {
@@ -12,7 +12,7 @@ body {
 }
 
 h1 {
-	margin: 0px auto auto auto;
+	margin: 0 auto auto auto;
 	text-align: center;
 	font-size: 24px;
 }
@@ -26,7 +26,7 @@ h1 {
 	margin-right: auto;
 	padding: 50px;
 	display: grid;
-	grid-template-columns: 750px 480px;
+	grid-template-columns: 730px 500px;
 	grid-template-rows: 75px 375px 450px;
 	gap: 15px;
 }
@@ -36,7 +36,7 @@ h1 {
 .card {
 	background-color: white;
 	border-radius: 10px;
-	box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
 	overflow: hidden;
 }
 
@@ -56,6 +56,7 @@ h1 {
 }
 
 .mapHelpCard {
+	padding: 10px 25px 10px 25px;
 	grid-column-start: 2;
 	grid-column-end: 3;
 	grid-row-start: 1;
@@ -63,10 +64,12 @@ h1 {
 }
 
 .viewCard {
+	padding: 25px;
 	grid-column-start: 2;
 	grid-column-end: 3;
 	grid-row-start: 2;
 	grid-row-end: 4;
+	overflow-y: scroll;
 }
 
 /* Map */
@@ -78,8 +81,7 @@ h1 {
 }
 
 .mapHelpText {
-	margin: 0px;
-	padding-left: 25px;
+	margin: 0;
 	position: relative;
 	top: 50%;
 	-ms-transform: translateY(-50%);
@@ -100,6 +102,7 @@ h1 {
 	height: 50px;
 	line-height: 50px;
 	font-size: 16px;
+	font-weight: bold;
 }
 
 .formRow > #address,
@@ -109,7 +112,7 @@ h1 {
 
 .formRow > input[type="range"] {
 	width: 300px;
-	margin-right: 0px;
+	margin-right: 0;
 	background: transparent;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -131,7 +134,7 @@ h1 {
 	height: 24px;
 	margin-top: -8px;
 	border-radius: 12px;
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 	background-color: white;
 	-webkit-appearance: none;
 	appearance: none;
@@ -140,7 +143,7 @@ h1 {
 .formRow > input[type="text"],
 .formRow > textarea {
 	padding: 5px 10px;
-	margin: 0px;
+	margin: 0;
 	display: inline-block;
 	border: 1px solid #ccc;
 	border-radius: 4px;

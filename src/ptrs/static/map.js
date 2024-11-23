@@ -1,6 +1,6 @@
 maptilersdk.config.apiKey = "X6QXRw7moQwVgb7tbcCO";
 const mapMarker = new maptilersdk.Marker({ color: "#ff0000" });
-const markerGPS = { longitude: null, lattitude: null, address: null };
+const markerGPS = { longitude: null, latitude: null, address: null };
 const map = new maptilersdk.Map({
 	container: "map",
 	style: maptilersdk.MapStyle.STREETS,
@@ -20,7 +20,7 @@ fetch("http://127.0.0.1:5000/data", {
 	.then((data) => {
 		for (let pothole of JSON.parse(data)) {
 			let marker = new maptilersdk.Marker({ color: "#0000ff" });
-			marker.setLngLat([pothole.longitude, pothole.lattitude]).addTo(map);
+			marker.setLngLat([pothole.longitude, pothole.latitude]).addTo(map);
 		}
 	})
 	.catch((error) => {
@@ -28,9 +28,9 @@ fetch("http://127.0.0.1:5000/data", {
 	});
 
 map.on("click", async function (e) {
-	[markerGPS.longitude, markerGPS.lattitude] = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-	mapMarker.setLngLat([markerGPS.longitude, markerGPS.lattitude]).addTo(map);
-	let url = `https://api.geoapify.com/v1/geocode/reverse?lat=${markerGPS.lattitude}&lon=${markerGPS.longitude}&apiKey=cae0e983bd184089b8f89641f5538ee8`;
+	[markerGPS.longitude, markerGPS.latitude] = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
+	mapMarker.setLngLat([markerGPS.longitude, markerGPS.latitude]).addTo(map);
+	let url = `https://api.geoapify.com/v1/geocode/reverse?lat=${markerGPS.latitude}&lon=${markerGPS.longitude}&apiKey=cae0e983bd184089b8f89641f5538ee8`;
 
 	fetch(url)
 		.then((result) => result.json())
@@ -43,7 +43,7 @@ map.on("click", async function (e) {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ address: markerGPS.address, lattitude: markerGPS.lattitude, longitude: markerGPS.longitude }),
+				body: JSON.stringify({ address: markerGPS.address, latitude: markerGPS.lattitude, longitude: markerGPS.longitude }),
 			})
 				.then((response) => response.text())
 				.catch((error) => {
