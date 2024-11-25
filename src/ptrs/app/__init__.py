@@ -59,6 +59,17 @@ POTHOLES = [
         "reportDate": "5:17PM on October 27th 2024",
         "expectedCompletion": "October 28th 2024",
     },
+    {
+        "latitude": 40.61988757212833,
+        "longitude": -79.15554698944091,
+        "address": "290 Pratt Dr, Indiana, PA 15705",
+        "size": 1,
+        "location": "",
+        "other": "",
+        "repairStatus": "Not Repaired",
+        "reportDate": "8:21PM on October 27th 2024",
+        "expectedCompletion": "October 28th 2024",
+    },
 ]
 
 

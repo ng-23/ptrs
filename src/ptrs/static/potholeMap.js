@@ -6,8 +6,8 @@ async function initMap() {
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
 		zoom: 15,
-		minZoom: 15,
-		maxZoom: 18,
+		minZoom: 12,
+		maxZoom: 20,
 		mapId: "c894f5bb0ee453ef",
 		disableDefaultUI: true,
 		zoomControl: true,
@@ -18,7 +18,7 @@ async function initMap() {
 		borderColor: "#990f02",
 		glyphColor: "white",
 	});
-	const marker = new AdvancedMarkerElement({
+	let marker = new AdvancedMarkerElement({
 		map,
 		content: pinRed.element,
 	});
@@ -31,6 +31,20 @@ async function initMap() {
 
 		geocoder.geocode({ location: e.latLng })
 			.then((response) => {
+				const addressComponents = response.results[0].address_components;
+				for (const component of addressComponents) {
+					if (component.types.includes('administrative_area_level_2')) {
+						const county = component.long_name;
+						if (county !== "Indiana County") {
+							marker = new AdvancedMarkerElement({
+								map,
+								content: pinRed.element,
+							});;
+							alert("Chosen pin is not within Indiana County!");
+							throw new Error("Chosen pin is not within Indiana County!");
+						}
+					}
+				}
 				let address = response.results[0].formatted_address.replace(", USA", "");
 				document.querySelector("#address").innerHTML = address;
 
@@ -45,6 +59,9 @@ async function initMap() {
 					.catch((error) => {
 						console.error("Error:", error);
 					});
+			})
+			.catch((error) => {
+				console.error("Error:", error);
 			});
 	});
 
@@ -77,9 +94,9 @@ async function initMap() {
 					map.setZoom(18);
 					map.setCenter(previousReport.position);
 					document.querySelector(".viewLabel.address").innerHTML = "Street Address:";
-					document.querySelector(".viewDescription.address").innerHTML = previousReport.address;
+					document.querySelector(".viewDescription.address").innerHTML = previousReport.address.replace(", PA 15701", "").replace(", PA 15705", "");
 					document.querySelector(".viewLabel.size").innerHTML = "Size:";
-					document.querySelector(".viewDescription.size").innerHTML = previousReport.size;
+					document.querySelector(".viewDescription.size").innerHTML = previousReport.size + "/10";
 					document.querySelector(".viewLabel.repairStatus").innerHTML = "Repair Status:";
 					document.querySelector(".viewDescription.repairStatus").innerHTML = previousReport.repairStatus;
 					document.querySelector(".viewLabel.reportDate").innerHTML = "Report Date:";
