@@ -5,14 +5,25 @@ async function initMap() {
 	const myLatLng = { lat: 40.6215, lng: -79.1525 };
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
-		zoom: 15,
-		minZoom: 12,
+		zoom: 12,
+		minZoom: 10,
 		maxZoom: 20,
 		mapId: "c894f5bb0ee453ef",
 		disableDefaultUI: true,
 		zoomControl: true,
 		clickableIcons: false,
 	});
+	const featureLayer = map.getFeatureLayer('ADMINISTRATIVE_AREA_LEVEL_2');
+	const featureStyleOptions = {
+		strokeColor: "black",
+		strokeOpacity: 0.25,
+		strokeWeight: 3.0,
+	};
+	featureLayer.style = (options) => {
+		if (options.feature.placeId == "ChIJVQHtdMRBy4kRWBdHCi1ccYc") {
+			return featureStyleOptions;
+		}
+	};
 	const pinRed = new PinElement({
 		background: "#ff0000",
 		borderColor: "#990f02",
