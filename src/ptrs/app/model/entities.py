@@ -1,5 +1,13 @@
+class Entity():
+    def to_tuple(self):
+        return tuple(vars(self).values())
+    
+    def __repr__(self):
+        attrs_and_vals = {attr[1:]: getattr(self, attr) for attr in self.__dict__ if attr.startswith('_')} # assumes the attributes of the class are prefixed with an _
+        
+        return f'{self.__class__.__name__}{attrs_and_vals}'
 
-class Pothole():
+class Pothole(Entity):
     VALID_SIZES = set(range(1,11))
     VALID_LOCATIONS = {'left_lane','right_lane','middle_lane','turn_lane','curbside',}
     VALID_REPAIR_TYPES = {'asphalt','concrete','unknown'}
@@ -72,5 +80,12 @@ class Pothole():
         repair_priority = repair_priority.lower()
         if repair_priority not in self.VALID_REPAIR_PRIORITIES:
             raise ValueError(f'Repair priority must be one of {self.VALID_REPAIR_PRIORITIES}, got {repair_priority} instead')
-        self._repair_priority = repair_priority
+        self._repair_priority = repair_priority     
+
+    def to_tuple(self, incl_id=False):
+        attrs = super().to_tuple()
+        if incl_id:
+            return attrs
+        else:
+            return attrs[1:]  
         
