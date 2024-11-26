@@ -1,11 +1,11 @@
 from abc import abstractmethod
-from flask import Request
+from flask import Request, ctx
 from ptrs.utils import Observer, Observerable
-from ptrs.app.model import data_mappers
+from ptrs.app.model import data_mappers, entities
 
 registered_services = {} # maps a Service class to a dict of {'name':str, 'data_mappers':[DataMapper]}
 
-def register_service(name:str, *data_mappers):
+def register_service(name:str, *data_mappers:(data_mappers.SQLiteDataMapper)):
     def decorator(service_class):
         if service_class in registered_services:
             raise ValueError(f'Service class {service_class} is already registered to a name and list of DataMappers')
@@ -26,6 +26,14 @@ class Service(Observerable):
     That said, in MVC, we allow certain external components like Views to "observe" Services and 
     be notified of when/how they change the state of the Model. Otherwise, Services do their work largely in silence.
     '''
+
+    @property
+    def db(self):
+        self._app_ctx = self
+
+    @db.setter
+    def app_ctx(self, app_ctx:ctx.AppContext):
+        self._app_ctx = app_ctx
     
     @abstractmethod
     def change_state(self, request:Request, *args, **kwargs) -> None:
@@ -44,7 +52,8 @@ class CreatePothole(Service):
         return super().notify_observers(*args, **kwargs)
 
     def change_state(self, request:Request, *args, **kwargs):
-        return super().change_state(*args, **kwargs)
+        self._pothole_mapper.db = self._app_ctx.db
+        return self._pothole_mapper.create(entities.Pothole('Oak St', 5, 'right_lane', 'asphalt', 'major'))
     
 @register_service('read_potholes', data_mappers.PotholeMapper)
 class ReadPotholes(Service):
@@ -59,4 +68,5 @@ class ReadPotholes(Service):
         return super().notify_observers(*args, **kwargs)
     
     def change_state(self, request:Request, *args, **kwargs) -> None:
-        return super().change_state(*args, **kwargs)
+        self._pothole_mapper.db = self._app_ctx.db
+        return self._pothole_mapper.read_by_id(request.view_args['id'])
