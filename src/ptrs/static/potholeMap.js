@@ -2,12 +2,12 @@ async function initMap() {
 	const { Map } = await google.maps.importLibrary("maps");
 	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 	const geocoder = new google.maps.Geocoder();
-	const myLatLng = { lat: 40.66062326610511, lng: -79.06163481811751 };
+	const myLatLng = { lat: 40.6215, lng: -79.1525 };
 
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
-		zoom: 10,
-		minZoom: 10,
+		zoom: 14.5,
+		minZoom: 14.5,
 		maxZoom: 20,
 		mapId: "c894f5bb0ee453ef",
 		disableDefaultUI: true,
@@ -15,14 +15,14 @@ async function initMap() {
 		clickableIcons: false,
 	});
 
-	const featureLayer = map.getFeatureLayer('ADMINISTRATIVE_AREA_LEVEL_2');
+	const featureLayer = map.getFeatureLayer('LOCALITY');
 	const featureStyleOptions = {
 		strokeColor: "#000000",
 		strokeOpacity: 0.25,
 		strokeWeight: 3.0,
 	};
 	featureLayer.style = (options) => {
-		if (options.feature.placeId === "ChIJVQHtdMRBy4kRWBdHCi1ccYc") {
+		if (options.feature.placeId === "ChIJL7Xug9hay4kRH6JTAD8i_2U") {
 			return featureStyleOptions;
 		}
 	};
