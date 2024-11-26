@@ -28,9 +28,10 @@ body {
 /* Cards */
 
 .card {
-	background-color: white;
+	background-color: #ffffff;
 	border-radius: 10px;
 	box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+	overflow: hidden;
 }
 
 .mapCard {
@@ -138,7 +139,7 @@ body {
 	margin-top: -8px;
 	border-radius: 12px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-	background-color: white;
+	background-color: #ffffff;
 	-webkit-appearance: none;
 	appearance: none;
 }
@@ -182,7 +183,7 @@ body {
 	border-radius: 25px;
 	font-family: "Open Sans";
 	font-size: 16px;
-	color: white;
+	color: #ffffff;
 }
 
 /* View Pothole List */

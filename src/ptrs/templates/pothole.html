@@ -12,6 +12,12 @@
 	<div class="card mapCard">
 		<div id="map"></div>
 	</div>
+	<div class="card mapHelpCard">
+		<p class="mapHelpText">
+			Click to place a <span style="color: red; font-weight: bold;">red</span> pin for a new report. <br />
+			Click on a <span style="color: blue; font-weight: bold;">blue</span> pin to view a reported pothole.
+		</p>
+	</div>
 	<div class="card submitCard">
 		<form action="{{ url_for('pothole') }}" method="post">
 			<div class="formRow">
@@ -38,12 +44,6 @@
 			</div>
 		</form>
 	</div>
-	<div class="card mapHelpCard">
-		<p class="mapHelpText">
-			Click to place a <span style="color: red; font-weight: bold;">red</span> pin for a new report. <br />
-			Click on a <span style="color: blue; font-weight: bold;">blue</span> pin to view a reported pothole.
-		</p>
-	</div>
 	<div class="card viewCard">
 		<h1>Selected Report</h1>
 		<span class="viewLabel address"></span>
@@ -56,7 +56,6 @@
 		<span class="viewDescription reportDate"></span>
 		<span class="viewLabel expectedCompletion"></span>
 		<span class="viewDescription expectedCompletion"></span>
-	</div>
 	</div>
 </div>
 <script type="module" src="{{ url_for('static', filename='potholeMap.js') }}"></script>

@@ -2,10 +2,11 @@ async function initMap() {
 	const { Map } = await google.maps.importLibrary("maps");
 	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 	const geocoder = new google.maps.Geocoder();
-	const myLatLng = { lat: 40.6215, lng: -79.1525 };
+	const myLatLng = { lat: 40.66062326610511, lng: -79.06163481811751 };
+
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
-		zoom: 12,
+		zoom: 10,
 		minZoom: 10,
 		maxZoom: 20,
 		mapId: "c894f5bb0ee453ef",
@@ -13,27 +14,28 @@ async function initMap() {
 		zoomControl: true,
 		clickableIcons: false,
 	});
+
 	const featureLayer = map.getFeatureLayer('ADMINISTRATIVE_AREA_LEVEL_2');
 	const featureStyleOptions = {
-		strokeColor: "black",
+		strokeColor: "#000000",
 		strokeOpacity: 0.25,
 		strokeWeight: 3.0,
 	};
 	featureLayer.style = (options) => {
-		if (options.feature.placeId == "ChIJVQHtdMRBy4kRWBdHCi1ccYc") {
+		if (options.feature.placeId === "ChIJVQHtdMRBy4kRWBdHCi1ccYc") {
 			return featureStyleOptions;
 		}
 	};
-	const pinRed = new PinElement({
+
+	let pinRed = new PinElement({
 		background: "#ff0000",
 		borderColor: "#990f02",
-		glyphColor: "white",
+		glyphColor: "#ffffff",
 	});
 	let marker = new AdvancedMarkerElement({
 		map,
 		content: pinRed.element,
 	});
-
 
 	map.addListener("click", (e) => {
 		let latitude = e.latLng.lat();
@@ -42,20 +44,24 @@ async function initMap() {
 
 		geocoder.geocode({ location: e.latLng })
 			.then((response) => {
-				const addressComponents = response.results[0].address_components;
-				for (const component of addressComponents) {
+				let addressComponents = response.results[0].address_components;
+
+				for (let component of addressComponents) {
 					if (component.types.includes('administrative_area_level_2')) {
-						const county = component.long_name;
+						let county = component.long_name;
+
 						if (county !== "Indiana County") {
 							marker = new AdvancedMarkerElement({
 								map,
 								content: pinRed.element,
-							});;
+							});
+
 							alert("Chosen pin is not within Indiana County!");
 							throw new Error("Chosen pin is not within Indiana County!");
 						}
 					}
 				}
+
 				let address = response.results[0].formatted_address.replace(", USA", "");
 				document.querySelector("#address").innerHTML = address;
 
@@ -85,27 +91,29 @@ async function initMap() {
 		.then((response) => response.text())
 		.then((data) => {
 			for (let pothole of JSON.parse(data)) {
-				const pinBlue = new PinElement({
+				let pinBlue = new PinElement({
 					background: "#0000ff",
 					borderColor: "#051094",
-					glyphColor: "white",
+					glyphColor: "#ffffff",
 				});
-				const previousReport = new AdvancedMarkerElement({
+				let previousReport = new AdvancedMarkerElement({
 					map,
 					position: { lat: pothole.latitude, lng: pothole.longitude },
 					content: pinBlue.element,
 				});
+
 				previousReport.address = pothole.address;
 				previousReport.size = pothole.size;
 				previousReport.other = pothole.other;
 				previousReport.repairStatus = pothole.repairStatus;
 				previousReport.reportDate = pothole.reportDate;
 				previousReport.expectedCompletion = pothole.expectedCompletion;
+
 				previousReport.addListener("click", () => {
 					map.setZoom(18);
 					map.setCenter(previousReport.position);
 					document.querySelector(".viewLabel.address").innerHTML = "Street Address:";
-					document.querySelector(".viewDescription.address").innerHTML = previousReport.address.replace(", PA 15701", "").replace(", PA 15705", "");
+					document.querySelector(".viewDescription.address").innerHTML = previousReport.address;
 					document.querySelector(".viewLabel.size").innerHTML = "Size:";
 					document.querySelector(".viewDescription.size").innerHTML = previousReport.size + "/10";
 					document.querySelector(".viewLabel.repairStatus").innerHTML = "Repair Status:";
