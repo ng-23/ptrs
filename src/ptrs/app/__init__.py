@@ -1,7 +1,7 @@
 import os
-from flask import Flask
+from flask import Flask, g
 from dotenv import load_dotenv
-from ptrs.app.database import db
+from ptrs.app import database
 
 '''
 When you import the ptrs.app package,
@@ -16,7 +16,7 @@ def create_app():
     app.config['DATABASE'] = os.getenv('DATABASE')
 
     with app.app_context():
-        db.init_db(schema=os.getenv('DATABASE_SCHEMA')) # this adds a database connection to the app instance
+        database.init_db(os.getenv('DATABASE_SCHEMA')) # this creates the database according to the provided schema and saves it to the provided location
 
     @app.route('/about')
     def about():

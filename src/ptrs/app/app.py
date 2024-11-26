@@ -1,7 +1,6 @@
-from flask import Flask
+from flask import Flask, g
 from ptrs.app.model import services
 from ptrs.app import controllers, create_app
-from ptrs.app.database import db
 
 '''
 This module creates a Flask instance, 
@@ -16,7 +15,7 @@ If you run this module through a proper WSGI server (e.g. gunicorn),
 that WSGI server will be used instead of Flask's default one.
 '''
 
-def add_routable_controllers(app:Flask, db):
+def add_routable_controllers(app:Flask):
     '''
     A routable Controller is a Controller with an API route assigned to it
     These Controllers are intended to be interacted with by the user via HTTP request methods
@@ -24,7 +23,7 @@ def add_routable_controllers(app:Flask, db):
     '''
 
     for (url_rule, req_method), controller_vars in controllers.routable_controllers.items():
-        data_mappers = [data_mapper_class(db) for data_mapper_class in services.registered_services[controller_vars['service_class']]['data_mappers']] # instantiate DataMappers the Controller's Service depends on
+        data_mappers = [data_mapper_class() for data_mapper_class in services.registered_services[controller_vars['service_class']]['data_mappers']] # instantiate DataMappers the Controller's Service depends on
         service = controller_vars['service_class'](*data_mappers) # instantiate the Service the Controller and its View depend on
         view = controller_vars['view_class'](service) # instantiate the View the Controller depends on
         service.register_observer(view) # View now observes the Service, so it will be notified by the Service when the Service changes the Model's state
@@ -38,8 +37,7 @@ def add_routable_controllers(app:Flask, db):
             )
     
 app = create_app()
-with app.app_context():
-    add_routable_controllers(app, db.get_db())
+add_routable_controllers(app)
 
 if __name__ == '__main__':
     # executed when running module directly

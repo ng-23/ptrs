@@ -1,6 +1,8 @@
 from ptrs.app import views
+from ptrs.app import database
 from ptrs.app.model import services
 from flask.views import View
+from flask import request, g
 from abc import ABC, abstractmethod
 
 # maps a Controller class to a dict of {'name':str, 'service':Service, 'view':View}
@@ -78,9 +80,11 @@ class CreatePothole(Controller):
         self._view = view
 
     def dispatch_request(self):
-        return 'Interacting w/ CreatePothole Controller'
+        database.get_db() # add a database connection to the current app/request context
+        self._service.app_ctx = g # point the Service to the current app/request context, from which it can get e.g. database connection
+        return f'Pothole id: {self._service.change_state(request)}'
 
-@register_routable_controller('/potholes/', 'GET')
+@register_routable_controller('/potholes/<int:id>', 'GET')
 @register_controller('read_potholes', services.ReadPotholes, views.ReadPotholes)
 class ReadPotholes(Controller):
     methods=['GET']
@@ -89,7 +93,9 @@ class ReadPotholes(Controller):
         self._service = service
         self._view = view
 
-    def dispatch_request(self):
-        return 'Interacting w/ ReadPotholes Controller'
+    def dispatch_request(self, id):
+        database.get_db()
+        self._service.app_ctx = g
+        return f'{self._service.change_state(request)}'
         
     
