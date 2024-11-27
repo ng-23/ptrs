@@ -1,14 +1,30 @@
 class Entity:
+    @classmethod  # see https://stackoverflow.com/questions/12179271/meaning-of-classmethod-and-staticmethod-for-beginner
+    def has_property(entity_class, property_name: str) -> bool:
+        # see https://stackoverflow.com/questions/17735520/determine-if-given-class-attribute-is-a-property-or-not-python-object
+        # properties are class-level attributes, not instance, so we must use type(self) or self.__class__ to check
+        if not hasattr(entity_class, property_name):
+            return False
+
+        if not isinstance(getattr(entity_class, property_name), property):
+            return False
+
+        return True
+
     def to_tuple(self):
         return tuple(vars(self).values())
 
+    def to_json(self):
+        res = {}
+
+        for attr in vars(type(self)):
+            if isinstance(getattr(type(self), attr), property):
+                res[attr] = getattr(self, attr)
+
+        return res
+
     def __repr__(self):
-        attrs_and_vals = {
-            attr[1:]: getattr(self, attr)
-            for attr in self.__dict__
-            if attr.startswith("_")
-        }  # assumes the attributes of the class are prefixed with an _
-        return f"{attrs_and_vals}"
+        return f"{type(self).__name__}{self.to_json()}"
 
 
 class Pothole(Entity):

@@ -1,3 +1,5 @@
+let newPotholeAddress = { latitude: 0, longitude: 0, address: "" };
+
 async function initMap() {
 	const { Map } = await google.maps.importLibrary("maps");
 	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
@@ -41,6 +43,7 @@ async function initMap() {
 		let latitude = e.latLng.lat();
 		let longitude = e.latLng.lng();
 		marker.position = { lat: latitude, lng: longitude };
+		[newPotholeAddress.latitude, newPotholeAddress.longitude] = [latitude, longitude];
 
 		geocoder
 			.geocode({ location: e.latLng })
@@ -64,25 +67,14 @@ async function initMap() {
 
 				let address = response.results[0].formatted_address.replace(", USA", "");
 				document.querySelector("#address").innerHTML = address;
-				console.log(address, latitude, longitude);
-
-				fetch("http://127.0.0.1:5000/pothole", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				})
-					.then((response) => response.text())
-					.catch((error) => {
-						console.error("Error:", error);
-					});
+				newPotholeAddress.address = address;
 			})
 			.catch((error) => {
 				console.error("Error:", error);
 			});
 	});
 
-	fetch("http://127.0.0.1:5000/potholes/1", {
+	fetch("/potholes", {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
@@ -90,42 +82,66 @@ async function initMap() {
 	})
 		.then((response) => response.text())
 		.then((data) => {
-			let pothole = JSON.parse(data);
-			let pinBlue = new PinElement({
-				background: "#0000ff",
-				borderColor: "#051094",
-				glyphColor: "#ffffff",
-			});
-			let previousReport = new AdvancedMarkerElement({
-				map,
-				position: { lat: pothole._latitude, lng: pothole._longitude },
-				content: pinBlue.element,
-			});
+			for (let pothole of JSON.parse(data).potholes) {
+				let pinBlue = new PinElement({
+					background: "#0000ff",
+					borderColor: "#051094",
+					glyphColor: "#ffffff",
+				});
+				let previousReport = new AdvancedMarkerElement({
+					map,
+					position: { lat: pothole.latitude, lng: pothole.longitude },
+					content: pinBlue.element,
+				});
 
-			previousReport.address = pothole._street_addr;
-			previousReport.size = pothole._size;
-			previousReport.repairStatus = pothole._repair_status;
-			previousReport.reportDate = pothole._report_date;
-			previousReport.expectedCompletion = pothole._expected_completion;
-
-			previousReport.addListener("click", () => {
-				map.setZoom(18);
-				map.setCenter(previousReport.position);
-				document.querySelector(".viewLabel.address").innerHTML = "Street Address:";
-				document.querySelector(".viewDescription.address").innerHTML = previousReport.address;
-				document.querySelector(".viewLabel.size").innerHTML = "Size:";
-				document.querySelector(".viewDescription.size").innerHTML = previousReport.size + "/10";
-				document.querySelector(".viewLabel.repairStatus").innerHTML = "Repair Status:";
-				document.querySelector(".viewDescription.repairStatus").innerHTML = previousReport.repairStatus;
-				document.querySelector(".viewLabel.reportDate").innerHTML = "Report Date:";
-				document.querySelector(".viewDescription.reportDate").innerHTML = previousReport.reportDate;
-				document.querySelector(".viewLabel.expectedCompletion").innerHTML = "Expected Completion Date:";
-				document.querySelector(".viewDescription.expectedCompletion").innerHTML = previousReport.expectedCompletion;
-			});
+				previousReport.addListener("click", () => {
+					map.setZoom(18);
+					map.setCenter(previousReport.position);
+					document.querySelector(".viewLabel.address").innerHTML = "Street Address:";
+					document.querySelector(".viewDescription.address").innerHTML = pothole.street_addr;
+					document.querySelector(".viewLabel.size").innerHTML = "Size:";
+					document.querySelector(".viewDescription.size").innerHTML = pothole.size + "/10";
+					document.querySelector(".viewLabel.repairStatus").innerHTML = "Repair Status:";
+					document.querySelector(".viewDescription.repairStatus").innerHTML = pothole.repair_status;
+					document.querySelector(".viewLabel.reportDate").innerHTML = "Report Date:";
+					document.querySelector(".viewDescription.reportDate").innerHTML = pothole.report_date;
+					document.querySelector(".viewLabel.expectedCompletion").innerHTML = "Expected Completion Date:";
+					document.querySelector(".viewDescription.expectedCompletion").innerHTML = pothole.expected_completion;
+				});
+			}
 		})
 		.catch((error) => {
 			console.error("Error:", error);
 		});
+
+	const form = document.querySelector("#newPotholeForm");
+	form.addEventListener("submit", function (e) {
+		let formData = new FormData(form);
+
+		fetch("/pothole", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				street_addr: newPotholeAddress.address,
+				latitude: newPotholeAddress.latitude,
+				longitude: newPotholeAddress.longitude,
+				size: formData.get("size") / 10,
+				location: formData.get("location"),
+				other: formData.get("other"),
+				repair_status: "Not Repaired",
+				repair_type: "asphalt",
+				repair_priority: "major",
+				report_date: "7:00AM on October 28th",
+				expected_completion: "October 29th",
+			}),
+		})
+			.then((response) => response.text())
+			.catch((error) => {
+				console.error("Error:", error);
+			});
+	});
 }
 
 window.initMap = initMap;

@@ -144,32 +144,32 @@ body {
 	appearance: none;
 }
 
-.formRow > input[type="text"],
-.formRow > textarea {
-	padding: 5px 10px;
-	margin: 0;
+.formRow > #location,
+.formRow > #other {
 	display: inline-block;
 	border: 1px solid #ccc;
-	border-radius: 4px;
 	box-sizing: border-box;
 	font-family: "Open Sans";
 	font-size: 16px;
 }
 
-.formRow > input:focus,
-.formRow > textarea:focus {
+.formRow > #location:focus,
+.formRow > #other:focus {
 	outline: none;
 }
 
 .formRow > #location {
-	width: 300px;
+	width: 125px;
 	height: 40px;
 	margin-left: auto;
+	text-align: center;
+	cursor: pointer;
 }
 
 .formRow > #other {
 	width: 100%;
 	height: 100px;
+	padding: 5px 10px;
 	resize: none;
 	overflow-y: scroll;
 }
@@ -184,6 +184,11 @@ body {
 	font-family: "Open Sans";
 	font-size: 16px;
 	color: #ffffff;
+	cursor: pointer;
+}
+
+.formRow > input[type="submit"]:hover {
+	background-color: #1e90ff;
 }
 
 /* View Pothole List */

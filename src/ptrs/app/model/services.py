@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from flask import Request, ctx
-from ptrs.utils import Observer, Observerable
+from ptrs.utils import Observer, Observerable, ModelState
 from ptrs.app.model import data_mappers, entities
 
 registered_services = (
@@ -9,6 +9,12 @@ registered_services = (
 
 
 def register_service(name: str, *data_mappers: (data_mappers.SQLiteDataMapper)):
+    """
+    Registers a Service class
+
+    Registered Services can be used by Controllers and Views in the app
+    """
+
     def decorator(service_class):
         if service_class in registered_services:
             raise ValueError(
@@ -58,26 +64,31 @@ class CreatePothole(Service):
     def register_observer(self, observer: Observer):
         self._observers.append(observer)
 
-    def notify_observers(self, *args, **kwargs):
-        return super().notify_observers(*args, **kwargs)
+    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
 
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
-        return self._pothole_mapper.create(
-            entities.Pothole(
-                "296 Elm St, Indiana, PA 15701",
-                40.61695696144055,
-                -79.14329436028484,
-                5,
-                "right_lane",
-                "",
-                "Not Repaired",
-                "asphalt",
-                "major",
-                "7:00AM on October 28th 2024",
-                "October 29th 2024",
+        if request.is_json and request.content_length > 0:
+            pothole = None
+            try:
+                pothole = entities.Pothole(**request.json)
+            except Exception as e:
+                self.notify_observers(
+                    ModelState(valid=False, message=str(e), errors=[e])
+                )
+            else:
+                self.notify_observers(
+                    self._pothole_mapper.create(pothole), *args, **kwargs
+                )
+        else:
+            self.notify_observers(
+                ModelState(
+                    valid=False,
+                    message=f"Request body must be of mimetype application/json and non-empty, got {request.mimetype} with length {request.content_length} instead",
+                ),
             )
-        )
 
 
 @register_service("read_potholes", data_mappers.PotholeMapper)
@@ -89,9 +100,11 @@ class ReadPotholes(Service):
     def register_observer(self, observer: Observer):
         self._observers.append(observer)
 
-    def notify_observers(self, *args, **kwargs):
-        return super().notify_observers(*args, **kwargs)
+    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
 
     def change_state(self, request: Request, *args, **kwargs) -> None:
         self._pothole_mapper.db = self._app_ctx.db
-        return self._pothole_mapper.read_by_id(request.view_args["id"])
+
+        self.notify_observers(self._pothole_mapper.read(dict(request.args)))

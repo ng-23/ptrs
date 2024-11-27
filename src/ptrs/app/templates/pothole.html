@@ -1,64 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>PTRS</title>
-		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}" />
-		<link href="https://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" />
-	</head>
-	<body>
-		<div class="gridContainer">
-			<div class="card mapCard">
-				<div id="map"></div>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>PTRS</title>
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}" />
+	<link href="https://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" />
+</head>
+<body>
+<div class="gridContainer">
+	<div class="card mapCard">
+		<div id="map"></div>
+	</div>
+	<div class="card mapHelpCard">
+		<p class="mapHelpText">
+			Click to place a <span style="color: red; font-weight: bold">red</span> pin for a new report. <br />
+			Click on a <span style="color: blue; font-weight: bold">blue</span> pin to view a reported pothole.
+		</p>
+	</div>
+	<div class="card submitCard">
+		<form id="newPotholeForm">
+			<div class="formRow">
+				<h1>New Report</h1>
 			</div>
-			<div class="card mapHelpCard">
-				<p class="mapHelpText">
-					Click to place a <span style="color: red; font-weight: bold;">red</span> pin for a new report. <br />
-					Click on a <span style="color: blue; font-weight: bold;">blue</span> pin to view a reported pothole.
-				</p>
+			<div class="formRow">
+				<label> Street Address: </label>
+				<span id="address">None Selected</span>
 			</div>
-			<div class="card submitCard">
-				<form id="form">
-					<div class="formRow">
-						<h1>New Report</h1>
-					</div>
-					<div class="formRow">
-						<label> Street Address: </label>
-						<span id="address">None Selected</span>
-					</div>
-					<div class="formRow">
-						<label for="size"> Size: </label>
-						<input type="range" id="size" name="size"></input>
-					</div>
-					<div class="formRow">
-						<label for="location"> Location In the Street: </label>
-						<input type="text" id="location" name="location" placeholder="Type Here" />
-					</div>
-					<div class="formRow">
-						<label for="other"> Other Necessary Information: </label><br />
-						<textarea id="other" name="other" placeholder="Type Here"></textarea>
-					</div>
-					<div class="formRow">
-						<input type="submit" value="Submit" />
-					</div>
-				</form>
+			<div class="formRow">
+				<label for="size"> Size: </label>
+				<input type="range" id="size" name="size" step="10" min="10" max="100" />
 			</div>
-			<div class="card viewCard">
-				<h1>Selected Report</h1>
-				<span class="viewLabel address"></span>
-				<span class="viewDescription address"></span>
-				<span class="viewLabel size"></span>
-				<span class="viewDescription size"></span>
-				<span class="viewLabel repairStatus"></span>
-				<span class="viewDescription repairStatus"></span>
-				<span class="viewLabel reportDate"></span>
-				<span class="viewDescription reportDate"></span>
-				<span class="viewLabel expectedCompletion"></span>
-				<span class="viewDescription expectedCompletion"></span>
+			<div class="formRow">
+				<label for="location"> Location In the Street: </label>
+				<select id="location" name="location">
+					<option value="left_lane">Left Lane</option>
+					<option value="right_lane">Right Lane</option>
+					<option value="middle_lane">Middle Lane</option>
+					<option value="turn_lane">Turn Lane</option>
+					<option value="curbside">Curbside</option>
+				</select>
 			</div>
-		</div>
-		<script type="module" src="{{ url_for('static', filename='potholeMap.js') }}"></script>
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs_wMRGpPPb74zD4Qf7FI_nE4cTR4JINw&loading=async&callback=initMap&v=weekly" defer></script>
-	</body>
+			<div class="formRow">
+				<label for="other"> Other Necessary Information: </label><br />
+				<textarea id="other" name="other" placeholder="Type Here"></textarea>
+			</div>
+			<div class="formRow">
+				<input type="submit" value="Submit" />
+			</div>
+		</form>
+	</div>
+	<div class="card viewCard">
+		<h1>Selected Report</h1>
+		<span class="viewLabel address"></span>
+		<span class="viewDescription address"></span>
+		<span class="viewLabel size"></span>
+		<span class="viewDescription size"></span>
+		<span class="viewLabel repairStatus"></span>
+		<span class="viewDescription repairStatus"></span>
+		<span class="viewLabel reportDate"></span>
+		<span class="viewDescription reportDate"></span>
+		<span class="viewLabel expectedCompletion"></span>
+		<span class="viewDescription expectedCompletion"></span>
+	</div>
+</div>
+<script type="module" src="{{ url_for('static', filename='pothole.js') }}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs_wMRGpPPb74zD4Qf7FI_nE4cTR4JINw&loading=async&callback=initMap&v=weekly" defer></script>
+</body>
 </html>
