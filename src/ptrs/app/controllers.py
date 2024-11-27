@@ -23,7 +23,7 @@ def register_controller(name:str, service:services.Service, view:views.View):
 
 # maps a tuple of (url_rule:str, req_method:str) to a dict of {'endpoint':str, 'controller_class':Controller, 'service_class':Service, 'view_class':View}
 # all routable Controllers are registered, but not all registered Controllers are routable
-# making a Controller routable allows the user to interact with it via HTTP request methods
+# making a Controller routable allows the user to interact with it via HTTP request methods sent to the app
 routable_controllers = {} 
 
 def register_routable_controller(url_rule:str, req_method:str):
@@ -82,9 +82,10 @@ class CreatePothole(Controller):
     def dispatch_request(self):
         database.get_db() # add a database connection to the current app/request context
         self._service.app_ctx = g # point the Service to the current app/request context, from which it can get e.g. database connection
-        return f'Pothole id: {self._service.change_state(request)}'
+        self._service.change_state(request) # tell Service to process user's request and change state of Model layer
+        return self._view.format_response()
 
-@register_routable_controller('/potholes/<int:id>', 'GET')
+@register_routable_controller('/potholes/', 'GET')
 @register_controller('read_potholes', services.ReadPotholes, views.ReadPotholes)
 class ReadPotholes(Controller):
     methods=['GET']
@@ -93,9 +94,9 @@ class ReadPotholes(Controller):
         self._service = service
         self._view = view
 
-    def dispatch_request(self, id):
+    def dispatch_request(self):
         database.get_db()
         self._service.app_ctx = g
-        return f'{self._service.change_state(request)}'
-        
+        self._service.change_state(request)
+        return self._view.format_response()
     
