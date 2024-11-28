@@ -1,11 +1,11 @@
-let newPotholeAddress = { latitude: 0, longitude: 0, address: "" };
-
 async function initMap() {
+	// Import libraries
 	const { Map } = await google.maps.importLibrary("maps");
 	const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 	const geocoder = new google.maps.Geocoder();
-	const myLatLng = { lat: 40.66062326610511, lng: -79.06163481811751 };
 
+	// Create map
+	const myLatLng = { lat: 40.66062326610511, lng: -79.06163481811751 };
 	const map = new Map(document.getElementById("map"), {
 		center: myLatLng,
 		zoom: 10,
@@ -17,6 +17,7 @@ async function initMap() {
 		clickableIcons: false,
 	});
 
+	// Feature layer adds outline on map of Indiana County
 	const featureLayer = map.getFeatureLayer("ADMINISTRATIVE_AREA_LEVEL_2");
 	const featureStyleOptions = {
 		strokeColor: "#000000",
@@ -29,6 +30,7 @@ async function initMap() {
 		}
 	};
 
+	// Create and style marker for new pothole
 	let pinRed = new PinElement({
 		background: "#ff0000",
 		borderColor: "#990f02",
@@ -39,7 +41,10 @@ async function initMap() {
 		content: pinRed.element,
 	});
 
+	let newPotholeAddress = { latitude: 0, longitude: 0, address: "" };
+
 	map.addListener("click", (e) => {
+		// Variables
 		let latitude = e.latLng.lat();
 		let longitude = e.latLng.lng();
 		marker.position = { lat: latitude, lng: longitude };
@@ -48,6 +53,7 @@ async function initMap() {
 		geocoder
 			.geocode({ location: e.latLng })
 			.then((response) => {
+				// Check for valid "Administrative Area Level 2" (County)
 				let addressComponents = response.results[0].address_components;
 				for (let component of addressComponents) {
 					if (component.types.includes("administrative_area_level_2")) {
@@ -83,30 +89,36 @@ async function initMap() {
 		.then((response) => response.text())
 		.then((data) => {
 			for (let pothole of JSON.parse(data).potholes) {
+				// Create and style markers for previous reports
 				let pinBlue = new PinElement({
 					background: "#0000ff",
 					borderColor: "#051094",
 					glyphColor: "#ffffff",
 				});
-				let previousReport = new AdvancedMarkerElement({
+				let previousReportMarker = new AdvancedMarkerElement({
 					map,
 					position: { lat: pothole.latitude, lng: pothole.longitude },
 					content: pinBlue.element,
 				});
 
-				previousReport.addListener("click", () => {
+				// View selected pothole use case
+				previousReportMarker.addListener("click", () => {
 					map.setZoom(18);
-					map.setCenter(previousReport.position);
-					document.querySelector(".viewLabel.address").innerHTML = "Street Address:";
-					document.querySelector(".viewDescription.address").innerHTML = pothole.street_addr;
-					document.querySelector(".viewLabel.size").innerHTML = "Size:";
-					document.querySelector(".viewDescription.size").innerHTML = pothole.size + "/10";
-					document.querySelector(".viewLabel.repairStatus").innerHTML = "Repair Status:";
-					document.querySelector(".viewDescription.repairStatus").innerHTML = pothole.repair_status;
-					document.querySelector(".viewLabel.reportDate").innerHTML = "Report Date:";
-					document.querySelector(".viewDescription.reportDate").innerHTML = pothole.report_date;
-					document.querySelector(".viewLabel.expectedCompletion").innerHTML = "Expected Completion Date:";
-					document.querySelector(".viewDescription.expectedCompletion").innerHTML = pothole.expected_completion;
+					map.setCenter(previousReportMarker.position);
+
+					let labels = document.querySelectorAll(".viewLabel");
+					let descriptions = document.querySelectorAll(".viewDescription");
+
+					labels[0].innerHTML = "Street Address:";
+					descriptions[0].innerHTML = pothole.street_addr;
+					labels[1].innerHTML = "Size:";
+					descriptions[1].innerHTML = pothole.size + "/10";
+					labels[2].innerHTML = "Repair Status:";
+					descriptions[2].innerHTML = pothole.repair_status;
+					labels[3].innerHTML = "Report Date:";
+					descriptions[3].innerHTML = pothole.report_date;
+					labels[4].innerHTML = "Expected Completion Date:";
+					descriptions[4].innerHTML = pothole.expected_completion;
 				});
 			}
 		})
@@ -115,9 +127,11 @@ async function initMap() {
 		});
 
 	const form = document.querySelector("#newPotholeForm");
-	form.addEventListener("submit", function (e) {
+	form.addEventListener("submit", function () {
+		// Variables
 		let formData = new FormData(form);
 
+		// Report pothole use case
 		fetch("/pothole", {
 			method: "POST",
 			headers: {
@@ -130,11 +144,6 @@ async function initMap() {
 				size: formData.get("size") / 10,
 				location: formData.get("location"),
 				other: formData.get("other"),
-				repair_status: "Not Repaired",
-				repair_type: "asphalt",
-				repair_priority: "major",
-				report_date: "7:00AM on October 28th",
-				expected_completion: "October 29th",
 			}),
 		})
 			.then((response) => response.text())

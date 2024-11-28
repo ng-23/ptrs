@@ -2,13 +2,14 @@ from abc import abstractmethod
 from flask import Request, ctx
 from ptrs.utils import Observer, Observerable, ModelState
 from ptrs.app.model import data_mappers, entities
+from datetime import datetime, date, timedelta
 
 registered_services = (
     {}
 )  # maps a Service class to a dict of {'name':str, 'data_mappers':[DataMapper]}
 
 
-def register_service(name: str, *data_mappers: (data_mappers.SQLiteDataMapper)):
+def register_service(name: str, *data_mappers: data_mappers.SQLiteDataMapper):
     """
     Registers a Service class
 
@@ -42,6 +43,9 @@ class Service(Observerable):
     be notified of when/how they change the state of the Model. Otherwise, Services do their work largely in silence.
     """
 
+    def __init__(self):
+        self._app_ctx = None
+
     @property
     def db(self):
         self._app_ctx = self
@@ -58,6 +62,7 @@ class Service(Observerable):
 @register_service("create_pothole", data_mappers.PotholeMapper)
 class CreatePothole(Service):
     def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
+        super().__init__()
         self._pothole_mapper = pothole_mapper
         self._observers = []
 
@@ -68,10 +73,29 @@ class CreatePothole(Service):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
+    @staticmethod
+    def calc_repair(request: Request):
+        request.json["repair_status"] = "Not Repaired"
+        request.json["repair_type"] = (
+            "concrete" if request.json["size"] >= 8 else "asphalt"
+        )
+        request.json["repair_priority"] = (
+            "major"
+            if request.json["size"] >= 8
+            else "medium" if request.json["size"] >= 4 else "minor"
+        )
+        request.json["report_date"] = (
+            f'{datetime.now().strftime("%I:%M:%S %p ") + date.today().strftime("%B %d, %Y")}'
+        )
+        request.json["expected_completion"] = (
+            f'{(date.today() + timedelta(2)).strftime("%B %d, %Y")}'
+        )
+
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
         if request.is_json and request.content_length > 0:
-            pothole = None
+            self.calc_repair(request)
+
             try:
                 pothole = entities.Pothole(**request.json)
             except Exception as e:
@@ -94,6 +118,7 @@ class CreatePothole(Service):
 @register_service("read_potholes", data_mappers.PotholeMapper)
 class ReadPotholes(Service):
     def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
+        super().__init__()
         self._pothole_mapper = pothole_mapper
         self._observers = []
 

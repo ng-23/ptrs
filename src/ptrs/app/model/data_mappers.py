@@ -4,6 +4,9 @@ from ptrs.app.model import entities
 
 
 class SQLiteDataMapper:
+    def __init__(self):
+        self._db = None
+
     @property
     def db(self):
         return self._db

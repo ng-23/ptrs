@@ -7,7 +7,7 @@ CREATE TABLE potholes (
     longitude FLOAT NOT NULL,
     size INTEGER NOT NULL,
     location TEXT NOT NULL,
-    other TEXT NOT NULL,
+    other TEXT,
     repair_status TEXT NOT NULL,
     repair_type TEXT NOT NULL,
     repair_priority TEXT NOT NULL,

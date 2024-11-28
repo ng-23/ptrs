@@ -1,12 +1,12 @@
 class Entity:
     @classmethod  # see https://stackoverflow.com/questions/12179271/meaning-of-classmethod-and-staticmethod-for-beginner
-    def has_property(entity_class, property_name: str) -> bool:
+    def has_property(cls, property_name: str) -> bool:
         # see https://stackoverflow.com/questions/17735520/determine-if-given-class-attribute-is-a-property-or-not-python-object
         # properties are class-level attributes, not instance, so we must use type(self) or self.__class__ to check
-        if not hasattr(entity_class, property_name):
+        if not hasattr(cls, property_name):
             return False
 
-        if not isinstance(getattr(entity_class, property_name), property):
+        if not isinstance(getattr(cls, property_name), property):
             return False
 
         return True
@@ -122,7 +122,6 @@ class Pothole(Entity):
 
     @street_addr.setter
     def street_addr(self, street_addr: str):
-        # TODO: verify that address actually exists and is within jurisdiction of local DPW
         self._street_addr = street_addr
 
     @latitude.setter

@@ -27,6 +27,9 @@ def register_view(name: str, service: services.Service):
 
 
 class View(Observer):
+    def __init__(self):
+        self._model_state = None
+
     @property
     def model_state(self):
         return self._model_state
@@ -43,10 +46,11 @@ class View(Observer):
 @register_view("create_pothole", services.CreatePothole)
 class CreatePothole(View):
     def __init__(self, service: services.CreatePothole):
+        super().__init__()
         self._service = service
         self.model_state = None
 
-    def format_response(self, *args, **kwargs) -> Response:
+    def format_response(self, *args, **kwargs) -> tuple[Response, int]:
         status = 200
         if not self._model_state.valid:
             status = 404
@@ -69,10 +73,11 @@ class CreatePothole(View):
 @register_view("read_potholes", services.ReadPotholes)
 class ReadPotholes(View):
     def __init__(self, service: services.ReadPotholes):
+        super().__init__()
         self._service = service
         self.model_state = None
 
-    def format_response(self, *args, **kwargs) -> Response:
+    def format_response(self, *args, **kwargs) -> tuple[Response, int]:
         status = 200
         if not self._model_state.valid:
             status = 404
