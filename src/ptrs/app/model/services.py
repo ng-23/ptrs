@@ -111,3 +111,77 @@ class ReadPotholes(Service):
         self._pothole_mapper.db = self._app_ctx.db
 
         self.notify_observers(self._pothole_mapper.read(dict(request.args)))
+
+
+@register_service("create_work_order", data_mappers.WorkOrderMapper)
+class CreateWorkOrder(Service):
+    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
+        super().__init__()
+        self._work_order_mapper = work_order_mapper
+        self._observers = []
+
+    def register_observer(self, observer: Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs):
+        self._work_order_mapper.db = self._app_ctx.db
+        if request.is_json and request.content_length > 0:
+            try:
+                work_order = entities.WorkOrder(**request.json)
+            except Exception as e:
+                self.notify_observers(
+                    ModelState(valid=False, message=str(e), errors=[e])
+                )
+            else:
+                self.notify_observers(
+                    self._work_order_mapper.create(work_order), *args, **kwargs
+                )
+        else:
+            self.notify_observers(
+                ModelState(
+                    valid=False,
+                    message=f"Request body must be of mimetype application/json and non-empty, got {request.mimetype} with length {request.content_length} instead",
+                ),
+            )
+
+
+@register_service("update_work_order", data_mappers.WorkOrderMapper)
+class UpdateWorkOrder(Service):
+    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
+        super().__init__()
+        self._work_order_mapper = work_order_mapper
+        self._observers = []
+
+    def register_observer(self, observer: Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs) -> None:
+        self._work_order_mapper.db = self._app_ctx.db
+
+
+@register_service("read_work_orders", data_mappers.WorkOrderMapper)
+class ReadWorkOrders(Service):
+    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
+        super().__init__()
+        self._work_order_mapper = work_order_mapper
+        self._observers = []
+
+    def register_observer(self, observer: Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs) -> None:
+        self._work_order_mapper.db = self._app_ctx.db
+
+        self.notify_observers(self._work_order_mapper.read(dict(request.args)))

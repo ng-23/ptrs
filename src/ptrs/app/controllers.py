@@ -83,24 +83,6 @@ class Controller(ABC, View):
     def dispatch_request(self):
         pass
 
-    @staticmethod
-    def calc_repair(request: Request):
-        request.json["repair_status"] = "Not Repaired"
-        request.json["repair_type"] = (
-            "concrete" if request.json["size"] >= 8 else "asphalt"
-        )
-        request.json["repair_priority"] = (
-            "major"
-            if request.json["size"] >= 8
-            else "medium" if request.json["size"] >= 4 else "minor"
-        )
-        request.json["report_date"] = (
-            f'{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}'
-        )
-        request.json["expected_completion"] = (
-            f'{(date.today() + timedelta(2)).strftime("%B %d, %Y")}'
-        )
-
 
 @register_routable_controller("/pothole/", "POST")
 @register_controller("create_pothole", services.CreatePothole, views.CreatePothole)
@@ -113,10 +95,26 @@ class CreatePothole(Controller):
         self._service = service
         self._view = view
 
+    @staticmethod
+    def update_request(request: Request):
+        request.json.update(
+            {
+                "repair_status": "Not Repaired",
+                "repair_type": "concrete" if request.json["size"] >= 8 else "asphalt",
+                "repair_priority": (
+                    "major"
+                    if request.json["size"] >= 8
+                    else "medium" if request.json["size"] >= 4 else "minor"
+                ),
+                "report_date": f'{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}',
+                "expected_completion": f'{(date.today() + timedelta(2)).strftime("%B %d, %Y")}',
+            }
+        )
+
     def dispatch_request(self):
         database.get_db()  # add a database connection to the current app/request context
         self._service.app_ctx = g  # point the Service to the current app/request context, from which it can get e.g. database connection
-        self.calc_repair(request)
+        self.update_request(request)
         self._service.change_state(
             request
         )  # tell Service to process user's request and change state of Model layer
@@ -131,6 +129,58 @@ class ReadPotholes(Controller):
     def __init__(
             self, service: services.ReadPotholes, view: views.ReadPotholes
     ) -> None:
+        self._service = service
+        self._view = view
+
+    def dispatch_request(self):
+        database.get_db()
+        self._service.app_ctx = g
+        self._service.change_state(request)
+        return self._view.format_response()
+
+
+@register_routable_controller("/workorder/", "POST")
+@register_controller(
+    "create_work_order", services.CreateWorkOrder, views.CreateWorkOrder
+)
+class CreateWorkOrder(Controller):
+    methods = ["POST"]
+
+    def __init__(self, service: services.CreateWorkOrder, view: views.CreateWorkOrder):
+        self._service = service
+        self._view = view
+
+    def dispatch_request(self):
+        database.get_db()
+        self._service.app_ctx = g
+        self._service.change_state(request)
+        return self._view.format_response()
+
+
+@register_routable_controller("/workorder/", "PATCH")
+@register_controller(
+    "update_work_order", services.UpdateWorkOrder, views.UpdateWorkOrder
+)
+class UpdateWorkOrder(Controller):
+    methods = ["PATCH"]
+
+    def __init__(self, service: services.UpdateWorkOrder, view: views.UpdateWorkOrder):
+        self._service = service
+        self._view = view
+
+    def dispatch_request(self):
+        database.get_db()
+        self._service.app_ctx = g
+        self._service.change_state(request)
+        return self._view.format_response()
+
+
+@register_routable_controller("/workorders/", "GET")
+@register_controller("read_work_orders", services.ReadWorkOrders, views.ReadWorkOrders)
+class ReadWorkOrders(Controller):
+    methods = ["GET"]
+
+    def __init__(self, service: services.ReadWorkOrders, view: views.ReadWorkOrders):
         self._service = service
         self._view = view
 

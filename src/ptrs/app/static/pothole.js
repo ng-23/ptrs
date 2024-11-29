@@ -116,7 +116,7 @@ async function initMap() {
 						pothole.expected_completion,
 					];
 
-					for (let i = 0; i < value.length; i++) {
+					for (let i = 0; i < values.length; i++) {
 						labels[i].style.display = "block";
 						descriptions[i].style.display = "block";
 						descriptions[i].innerHTML = values[i];
@@ -145,7 +145,7 @@ async function initMap() {
 				longitude: newPotholeAddress.longitude,
 				size: formData.get("size") / 10,
 				location: formData.get("location"),
-				other: formData.get("other"),
+				other_info: formData.get("other"),
 			}),
 		})
 			.then((response) => response.text())

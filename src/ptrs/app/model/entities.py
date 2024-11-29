@@ -47,22 +47,22 @@ class Pothole(Entity):
             longitude: float,
             size: int,
             location: str,
-            other: str,
+            other_info: str,
             repair_status: str,
             repair_type: str,
             repair_priority: str,
             report_date: str,
             expected_completion: str,
-            id: int | None = None,
+            pothole_id: int | None = None,
     ):
         # see https://realpython.com/python-getter-setter/ for why/how to write getters and setters in Python
-        self.id = id
+        self.pothole_id = pothole_id
         self.street_addr = street_addr
         self.latitude = latitude
         self.longitude = longitude
         self.size = size
         self.location = location
-        self.other = other
+        self.other_info = other_info
         self.repair_status = repair_status
         self.repair_type = repair_type
         self.repair_priority = repair_priority
@@ -70,8 +70,8 @@ class Pothole(Entity):
         self.expected_completion = expected_completion
 
     @property
-    def id(self):
-        return self._id
+    def pothole_id(self):
+        return self._pothole_id
 
     @property
     def street_addr(self):
@@ -94,8 +94,8 @@ class Pothole(Entity):
         return self._location
 
     @property
-    def other(self):
-        return self._other
+    def other_info(self):
+        return self._other_info
 
     @property
     def repair_status(self):
@@ -117,9 +117,9 @@ class Pothole(Entity):
     def expected_completion(self):
         return self._expected_completion
 
-    @id.setter
-    def id(self, id: int | None):
-        self._id = id
+    @pothole_id.setter
+    def pothole_id(self, pothole_id: int | None):
+        self._pothole_id = pothole_id
 
     @street_addr.setter
     def street_addr(self, street_addr: str):
@@ -150,9 +150,9 @@ class Pothole(Entity):
             )
         self._location = location
 
-    @other.setter
-    def other(self, other: str):
-        self._other = other
+    @other_info.setter
+    def other_info(self, other_info: str):
+        self._other_info = other_info
 
     @repair_status.setter
     def repair_status(self, repair_status: str):
@@ -188,6 +188,69 @@ class Pothole(Entity):
     @expected_completion.setter
     def expected_completion(self, expected_completion: str):
         self._expected_completion = expected_completion
+
+    def to_tuple(self, incl_id=False):
+        attrs = super().to_tuple()
+        if incl_id:
+            return attrs
+        else:
+            return attrs[1:]
+
+
+class WorkOrder(Entity):
+    def __init__(
+            self,
+            pothole_id: int,
+            assignment_date: str,
+            repair_status: str,
+            estimated_man_hours: int,
+            work_order_id: int | None = None,
+    ):
+        self.work_order_id = work_order_id
+        self.pothole_id = pothole_id
+        self.assignment_date = assignment_date
+        self.repair_status = repair_status
+        self.estimated_man_hours = estimated_man_hours
+
+    @property
+    def work_order_id(self):
+        return self._work_order_id
+
+    @property
+    def pothole_id(self):
+        return self._pothole_id
+
+    @property
+    def assignment_date(self):
+        return self._assignment_date
+
+    @property
+    def repair_status(self):
+        return self._repair_status
+
+    @property
+    def estimated_man_hours(self):
+        return self._estimated_man_hours
+
+    @work_order_id.setter
+    def work_order_id(self, work_order_id: int | None):
+        self._work_order_id = work_order_id
+
+    @pothole_id.setter
+    def pothole_id(self, pothole_id: int):
+        self._pothole_id = pothole_id
+
+    @assignment_date.setter
+    def assignment_date(self, assignment_date: str):
+        self._assignment_date = assignment_date
+
+    @repair_status.setter
+    def repair_status(self, repair_status: str):
+        self._repair_status = repair_status
+
+    @estimated_man_hours.setter
+    def estimated_man_hours(self, estimated_man_hours: int):
+        self._estimated_man_hours = estimated_man_hours
 
     def to_tuple(self, incl_id=False):
         attrs = super().to_tuple()

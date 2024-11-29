@@ -27,6 +27,7 @@ class ModelState:
 
     Intended to be consumed by an Observer of a Service (e.g. a View) for further processing
     """
+
     valid: bool = False
     message: str = ""
     data: any = None

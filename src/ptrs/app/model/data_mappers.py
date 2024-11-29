@@ -48,22 +48,22 @@ class PotholeMapper(SQLiteDataMapper):
         super().__init__()
 
     def create(self, pothole: entities.Pothole):
-        query = """INSERT INTO potholes (street_addr,latitude,longitude,size,location,other,repair_status,repair_type,repair_priority,report_date,expected_completion) 
+        query = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,repair_type,repair_priority,report_date,expected_completion) 
         VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
 
-        pothole.id = super()._exec_dml_command(
+        pothole.pothole_id = super()._exec_dml_command(
             query, args=pothole.to_tuple(incl_id=False)
         )
 
         return utils.ModelState(valid=True, data=pothole)
 
     def read(self, query_params: dict):
-        query = """SELECT id,street_addr,latitude,longitude,size,location,other,repair_status,repair_type,repair_priority,report_date,expected_completion FROM potholes"""
+        query = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
 
         if len(query_params) > 0:
             query += " WHERE "
 
-            # TODO: could this possibly introduce a SQL injection vulnerability?
+            # TODO: could this possibly introduce an SQL injection vulnerability?
             for param in query_params:
                 if not entities.Pothole.has_property(param):
                     return utils.ModelState(
@@ -82,4 +82,49 @@ class PotholeMapper(SQLiteDataMapper):
             valid=True,
             message=f"Found {len(potholes)} potholes matching query",
             data=potholes,
+        )
+
+
+class WorkOrderMapper(SQLiteDataMapper):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def create(self, work_order: entities.WorkOrder):
+        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,repair_status,estimated_man_hours) 
+        VALUES (?,?,?,?)"""
+
+        work_order.work_order_id = super()._exec_dml_command(
+            query, args=work_order.to_tuple(incl_id=False)
+        )
+
+        return utils.ModelState(valid=True, data=work_order)
+
+    def update(self, work_order: entities.WorkOrder):
+        pass
+
+    def read(self, query_params: dict):
+        query = """SELECT work_order_id,pothole_id,assignment_date,repair_status,estimated_man_hours FROM WorkOrders"""
+
+        if len(query_params) > 0:
+            query += " WHERE "
+
+            # TODO: could this possibly introduce an SQL injection vulnerability?
+            for param in query_params:
+                if not entities.WorkOrder.has_property(param):
+                    return utils.ModelState(
+                        valid=False,
+                        message=f"WorkOrder has no property {param} to query by",
+                    )
+            query += " AND ".join([f"{param}=?" for param in query_params])
+
+        records = super()._exec_dql_command(
+            query, args=tuple(query_params.values()), return_one=False
+        )
+
+        work_orders = [entities.WorkOrder(**dict(record)) for record in records]
+
+        return utils.ModelState(
+            valid=True,
+            message=f"Found {len(work_orders)} work orders matching query",
+            data=work_orders,
         )
