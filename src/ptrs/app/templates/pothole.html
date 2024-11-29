@@ -24,8 +24,8 @@
 				<h1>New Report</h1>
 			</div>
 			<div class="formRow">
-				<label> Street Address: </label>
-				<span id="address">None Selected</span>
+				<label for="address"> Street Address: </label>
+				<input type="text" id="address" name="address" value="None Selected" disabled />
 			</div>
 			<div class="formRow">
 				<label for="size"> Size: </label>
@@ -52,16 +52,21 @@
 	</div>
 	<div class="card viewCard">
 		<h1>Selected Report</h1>
-		<span class="viewLabel address"></span>
-		<span class="viewDescription address"></span>
-		<span class="viewLabel size"></span>
-		<span class="viewDescription size"></span>
-		<span class="viewLabel repairStatus"></span>
-		<span class="viewDescription repairStatus"></span>
-		<span class="viewLabel reportDate"></span>
-		<span class="viewDescription reportDate"></span>
-		<span class="viewLabel expectedCompletion"></span>
-		<span class="viewDescription expectedCompletion"></span>
+		<!-- Address -->
+		<span class="viewLabel"></span>
+		<span class="viewDescription"></span>
+		<!-- Size -->
+		<span class="viewLabel"></span>
+		<span class="viewDescription"></span>
+		<!-- Repair Status -->
+		<span class="viewLabel"></span>
+		<span class="viewDescription"></span>
+		<!-- Report Date -->
+		<span class="viewLabel"></span>
+		<span class="viewDescription"></span>
+		<!-- Expected Completion Date -->
+		<span class="viewLabel"></span>
+		<span class="viewDescription"></span>
 	</div>
 </div>
 <script type="module" src="{{ url_for('static', filename='pothole.js') }}"></script>

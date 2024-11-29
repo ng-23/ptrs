@@ -1,6 +1,6 @@
-from typing import List
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import List
 
 
 # code largely from Python example in Wikipedia page about observer pattern
@@ -27,7 +27,6 @@ class ModelState:
 
     Intended to be consumed by an Observer of a Service (e.g. a View) for further processing
     """
-
     valid: bool = False
     message: str = ""
     data: any = None

@@ -1,7 +1,7 @@
-from flask import Response, jsonify
-from abc import abstractmethod
 from ptrs.utils import Observer, ModelState
 from ptrs.app.model import services, entities
+from flask import Response, jsonify
+from abc import abstractmethod
 
 registered_views = {}  # maps a View class to a dict of {'name':str, 'service':Service}
 

@@ -1,6 +1,6 @@
-from flask import Flask
-from ptrs.app.model import services
 from ptrs.app import controllers, create_app
+from ptrs.app.model import services
+from flask import Flask
 
 """
 This module creates a Flask instance, 

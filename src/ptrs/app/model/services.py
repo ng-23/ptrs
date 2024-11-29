@@ -1,12 +1,10 @@
-from abc import abstractmethod
-from flask import Request, ctx
 from ptrs.utils import Observer, Observerable, ModelState
 from ptrs.app.model import data_mappers, entities
-from datetime import datetime, date, timedelta
+from flask import Request, ctx
+from abc import abstractmethod
 
-registered_services = (
-    {}
-)  # maps a Service class to a dict of {'name':str, 'data_mappers':[DataMapper]}
+# maps a Service class to a dict of {'name':str, 'data_mappers':[DataMapper]}
+registered_services = {}
 
 
 def register_service(name: str, *data_mappers: data_mappers.SQLiteDataMapper):
@@ -47,10 +45,10 @@ class Service(Observerable):
         self._app_ctx = None
 
     @property
-    def db(self):
-        self._app_ctx = self
+    def app_ctx(self):
+        return self._app_ctx
 
-    @db.setter
+    @app_ctx.setter
     def app_ctx(self, app_ctx: ctx.AppContext):
         self._app_ctx = app_ctx
 
@@ -73,29 +71,9 @@ class CreatePothole(Service):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
-    @staticmethod
-    def calc_repair(request: Request):
-        request.json["repair_status"] = "Not Repaired"
-        request.json["repair_type"] = (
-            "concrete" if request.json["size"] >= 8 else "asphalt"
-        )
-        request.json["repair_priority"] = (
-            "major"
-            if request.json["size"] >= 8
-            else "medium" if request.json["size"] >= 4 else "minor"
-        )
-        request.json["report_date"] = (
-            f'{datetime.now().strftime("%I:%M:%S %p ") + date.today().strftime("%B %d, %Y")}'
-        )
-        request.json["expected_completion"] = (
-            f'{(date.today() + timedelta(2)).strftime("%B %d, %Y")}'
-        )
-
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
         if request.is_json and request.content_length > 0:
-            self.calc_repair(request)
-
             try:
                 pothole = entities.Pothole(**request.json)
             except Exception as e:

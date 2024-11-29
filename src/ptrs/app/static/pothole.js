@@ -72,7 +72,7 @@ async function initMap() {
 				}
 
 				let address = response.results[0].formatted_address.replace(", USA", "");
-				document.querySelector("#address").innerHTML = address;
+				document.querySelector("#address").value = address;
 				newPotholeAddress.address = address;
 			})
 			.catch((error) => {
@@ -114,7 +114,7 @@ async function initMap() {
 					labels[1].innerHTML = "Size:";
 					descriptions[1].innerHTML = pothole.size + "/10";
 					labels[2].innerHTML = "Repair Status:";
-					descriptions[2].innerHTML = pothole.repair_status;
+					descriptions[2].innerHTML = pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
 					labels[3].innerHTML = "Report Date:";
 					descriptions[3].innerHTML = pothole.report_date;
 					labels[4].innerHTML = "Expected Completion Date:";

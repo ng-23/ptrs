@@ -2,8 +2,9 @@ from ptrs.app import views
 from ptrs.app import database
 from ptrs.app.model import services
 from flask.views import View
-from flask import request, g
+from flask import request, Request, g
 from abc import ABC, abstractmethod
+from datetime import datetime, date, timedelta
 
 # maps a Controller class to a dict of {'name':str, 'service':Service, 'view':View}
 # registered Controllers can be assigned routes in the app, allowing the user to interact with them
@@ -82,6 +83,24 @@ class Controller(ABC, View):
     def dispatch_request(self):
         pass
 
+    @staticmethod
+    def calc_repair(request: Request):
+        request.json["repair_status"] = "Not Repaired"
+        request.json["repair_type"] = (
+            "concrete" if request.json["size"] >= 8 else "asphalt"
+        )
+        request.json["repair_priority"] = (
+            "major"
+            if request.json["size"] >= 8
+            else "medium" if request.json["size"] >= 4 else "minor"
+        )
+        request.json["report_date"] = (
+            f'{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}'
+        )
+        request.json["expected_completion"] = (
+            f'{(date.today() + timedelta(2)).strftime("%B %d, %Y")}'
+        )
+
 
 @register_routable_controller("/pothole/", "POST")
 @register_controller("create_pothole", services.CreatePothole, views.CreatePothole)
@@ -97,6 +116,7 @@ class CreatePothole(Controller):
     def dispatch_request(self):
         database.get_db()  # add a database connection to the current app/request context
         self._service.app_ctx = g  # point the Service to the current app/request context, from which it can get e.g. database connection
+        self.calc_repair(request)
         self._service.change_state(
             request
         )  # tell Service to process user's request and change state of Model layer

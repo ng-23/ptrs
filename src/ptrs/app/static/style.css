@@ -7,8 +7,8 @@ body {
 }
 
 body {
-	background-color: #f5f5f5;
-	font-family: "Open Sans";
+	background-color: #ffffff;
+	font-family: "Open Sans", serif;
 }
 
 /* Grid */
@@ -105,6 +105,7 @@ body {
 	line-height: 50px;
 	font-size: 16px;
 	font-weight: bold;
+	cursor: text;
 }
 
 .formRow > #address,
@@ -112,6 +113,22 @@ body {
 	max-width: 400px;
 	margin-left: auto;
 	text-align: right;
+}
+
+.formRow > #address {
+	width: 400px;
+	height: 40px;
+	padding: 5px 10px;
+	display: inline-block;
+	border: none;
+	font-family: "Open Sans", serif;
+	font-size: 16px;
+}
+
+.formRow > #address:disabled {
+	background: none;
+	color: #000000;
+	cursor: text;
 }
 
 .formRow > input[type="range"] {
@@ -149,7 +166,7 @@ body {
 	display: inline-block;
 	border: 1px solid #ccc;
 	box-sizing: border-box;
-	font-family: "Open Sans";
+	font-family: "Open Sans", serif;
 	font-size: 16px;
 }
 
@@ -181,7 +198,7 @@ body {
 	background-color: #007aff;
 	border: none;
 	border-radius: 25px;
-	font-family: "Open Sans";
+	font-family: "Open Sans", serif;
 	font-size: 16px;
 	color: #ffffff;
 	cursor: pointer;
@@ -201,14 +218,17 @@ body {
 }
 
 .viewLabel {
+	height: 35px;
 	display: block;
 	font-size: 16px;
 	font-weight: bold;
 	line-height: 35px;
 }
 .viewDescription {
+	height: 35px;
 	display: block;
 	padding-left: 20px;
 	font-size: 16px;
 	line-height: 35px;
+	overflow: hidden;
 }

@@ -57,7 +57,7 @@ class PotholeMapper(SQLiteDataMapper):
 
         return utils.ModelState(valid=True, data=pothole)
 
-    def read(self, query_params: dict, sort_and_order_by: dict | None = None):
+    def read(self, query_params: dict):
         query = """SELECT id,street_addr,latitude,longitude,size,location,other,repair_status,repair_type,repair_priority,report_date,expected_completion FROM potholes"""
 
         if len(query_params) > 0:
