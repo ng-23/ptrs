@@ -108,17 +108,19 @@ async function initMap() {
 
 					let labels = document.querySelectorAll(".viewLabel");
 					let descriptions = document.querySelectorAll(".viewDescription");
+					let values = [
+						pothole.street_addr,
+						pothole.size,
+						pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase()),
+						pothole.report_date,
+						pothole.expected_completion,
+					];
 
-					labels[0].innerHTML = "Street Address:";
-					descriptions[0].innerHTML = pothole.street_addr;
-					labels[1].innerHTML = "Size:";
-					descriptions[1].innerHTML = pothole.size + "/10";
-					labels[2].innerHTML = "Repair Status:";
-					descriptions[2].innerHTML = pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
-					labels[3].innerHTML = "Report Date:";
-					descriptions[3].innerHTML = pothole.report_date;
-					labels[4].innerHTML = "Expected Completion Date:";
-					descriptions[4].innerHTML = pothole.expected_completion;
+					for (let i = 0; i < value.length; i++) {
+						labels[i].style.display = "block";
+						descriptions[i].style.display = "block";
+						descriptions[i].innerHTML = values[i];
+					}
 				});
 			}
 		})
