@@ -61,7 +61,7 @@ class PotholeMapper(SQLiteDataMapper):
         query = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
 
-        if len(query_params) > 0:
+        if len(query_params) > 1:
             query += " WHERE "
 
             # TODO: could this possibly introduce an SQL injection vulnerability?
@@ -69,6 +69,8 @@ class PotholeMapper(SQLiteDataMapper):
                 if not entities.Pothole.has_property(param):
                     return utils.ModelState(valid=False, message=f"Pothole has no property {param} to query by")
             query += " AND ".join([f"{param}=?" for param in query_params])
+        else:
+            return utils.ModelState(valid=False, message="Update Work Orders should have at least 2 parameters")
 
         records = super()._exec_dql_command(query, args=tuple(query_params.values()), return_one=False)
 
