@@ -74,7 +74,6 @@ class Controller(ABC, View):
     which allows Flask to take care of mapping API routes to them and us to
     define their behavior more in line with the MVC definition.
     """
-
     @abstractmethod
     def dispatch_request(self):
         pass
@@ -95,11 +94,7 @@ class CreatePothole(Controller):
             {
                 "repair_status": "Not Repaired",
                 "repair_type": "concrete" if request.json["size"] >= 8 else "asphalt",
-                "repair_priority": (
-                    "major"
-                    if request.json["size"] >= 8
-                    else "medium" if request.json["size"] >= 4 else "minor"
-                ),
+                "repair_priority": ("major" if request.json["size"] >= 8 else "medium" if request.json["size"] >= 4 else "minor"),
                 "report_date": f'{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}',
                 "expected_completion": f'{(date.today() + timedelta(2)).strftime("%B %d, %Y")}',
             }
@@ -110,6 +105,22 @@ class CreatePothole(Controller):
         self._service.app_ctx = g  # point the Service to the current app/request context, from which it can get e.g. database connection
         self.update_request(request)
         self._service.change_state(request)  # tell Service to process user's request and change state of Model layer
+        return self._view.format_response()
+
+
+@register_routable_controller("/pothole/", "PATCH")
+@register_controller("update_pothole", services.UpdatePothole, views.UpdatePothole)
+class UpdatePothole(Controller):
+    methods = ["PATCH"]
+
+    def __init__(self, service: services.UpdatePothole, view: views.UpdatePothole):
+        self._service = service
+        self._view = view
+
+    def dispatch_request(self):
+        database.get_db()
+        self._service.app_ctx = g
+        self._service.change_state(request)
         return self._view.format_response()
 
 

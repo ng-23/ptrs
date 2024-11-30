@@ -13,7 +13,6 @@ def register_service(name: str, *data_mappers: data_mappers.SQLiteDataMapper):
 
     Registered Services can be used by Controllers and Views in the app
     """
-
     def decorator(service_class):
         if service_class in registered_services:
             raise ValueError(f"Service class {service_class} is already registered to a name and list of DataMappers")
@@ -38,7 +37,6 @@ class Service(Observerable):
     That said, in MVC, we allow certain external components like Views to "observe" Services and
     be notified of when/how they change the state of the Model. Otherwise, Services do their work largely in silence.
     """
-
     def __init__(self):
         self._app_ctx = None
 
@@ -88,6 +86,25 @@ class CreatePothole(Service):
             )
 
 
+@register_service("update_pothole", data_mappers.PotholeMapper)
+class UpdatePothole(Service):
+    def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
+        super().__init__()
+        self._pothole_mapper = pothole_mapper
+        self._observers = []
+
+    def register_observer(self, observer: Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs):
+        self._pothole_mapper.db = self._app_ctx.db
+        self.notify_observers(self._pothole_mapper.update(dict(request.json)))
+
+
 @register_service("read_potholes", data_mappers.PotholeMapper)
 class ReadPotholes(Service):
     def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
@@ -104,7 +121,6 @@ class ReadPotholes(Service):
 
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
-
         self.notify_observers(self._pothole_mapper.read(dict(request.args)))
 
 
@@ -157,7 +173,6 @@ class UpdateWorkOrder(Service):
 
     def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
-
         self.notify_observers(self._work_order_mapper.update(dict(request.json)))
 
 
@@ -177,5 +192,4 @@ class ReadWorkOrders(Service):
 
     def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
-
         self.notify_observers(self._work_order_mapper.read(dict(request.args)))

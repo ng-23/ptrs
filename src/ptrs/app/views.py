@@ -12,7 +12,6 @@ def register_view(name: str, service: services.Service):
 
     Registered Views can be used by Controllers in the app
     """
-
     def decorator(view_class):
         if view_class in registered_views:
             raise ValueError(f"View class {view_class} is already registered to a name and Service")
@@ -44,6 +43,33 @@ class View(Observer):
 @register_view("create_pothole", services.CreatePothole)
 class CreatePothole(View):
     def __init__(self, service: services.CreatePothole):
+        super().__init__()
+        self._service = service
+        self.model_state = None
+
+    def format_response(self, *args, **kwargs) -> tuple[Response, int]:
+        status = 200
+        if not self._model_state.valid:
+            status = 404
+
+        data = {}
+        if self._model_state.data is not None:
+            data = self._model_state.data
+            if isinstance(data, entities.Entity):
+                data = data.to_json()
+
+        if status == 404:
+            data["message"] = self._model_state.message
+
+        return jsonify(**data), status
+
+    def notify(self, model_state: ModelState):
+        self.model_state = model_state
+
+
+@register_view("update_pothole", services.UpdatePothole)
+class UpdatePothole(View):
+    def __init__(self, service: services.UpdatePothole):
         super().__init__()
         self._service = service
         self.model_state = None

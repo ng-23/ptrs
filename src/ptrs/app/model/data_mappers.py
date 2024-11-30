@@ -20,7 +20,6 @@ class SQLiteDataMapper:
         Executes a general Data Query Language (DQL) command (e.g. SELECT) on the SQLite database.
         Largely the same as query_db() function from https://flask.palletsprojects.com/en/stable/patterns/sqlite3/.
         """
-
         cursor = self._db.execute(query, args)
         result_vals = cursor.fetchall()
         cursor.close()
@@ -34,7 +33,6 @@ class SQLiteDataMapper:
         """
         Executes a general Data Manipulation Language (DML) command (e.g. INSERT, UPDATE) on the SQLite database.
         """
-
         cursor = self._db.execute(query, args)
         self._db.commit()
         if not update:
@@ -57,11 +55,33 @@ class PotholeMapper(SQLiteDataMapper):
 
         return utils.ModelState(valid=True, data=pothole)
 
+    def update(self, query_params: dict):
+        if len(query_params) < 2:
+            return utils.ModelState(valid=False, message="Update Pothole should have at least 2 parameters")
+
+        query = """UPDATE Potholes SET """
+
+        # TODO: could this possibly introduce an SQL injection vulnerability?
+        for param in query_params:
+            if not entities.Pothole.has_property(param):
+                return utils.ModelState(valid=False, message=f"Pothole has no property {param} to query by")
+        query += ", ".join([f"{param}=?" if param != "pothole_id" else "" for param in query_params])
+
+        query = query[:-2] + " WHERE pothole_id=?;"
+
+        super()._exec_dml_command(query, args=tuple(query_params.values()), update=True)
+
+        query = """SELECT street_addr,latitude,longitude,size,location,other_info,repair_status,repair_type,
+        repair_priority,report_date,expected_completion FROM Potholes WHERE pothole_id=?"""
+        pothole = dict(super()._exec_dql_command(query, args=(query_params["pothole_id"],), return_one=True))
+
+        return utils.ModelState(valid=True, data=pothole)
+
     def read(self, query_params: dict):
         query = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
 
-        if len(query_params) > 1:
+        if len(query_params) > 0:
             query += " WHERE "
 
             # TODO: could this possibly introduce an SQL injection vulnerability?
@@ -69,8 +89,6 @@ class PotholeMapper(SQLiteDataMapper):
                 if not entities.Pothole.has_property(param):
                     return utils.ModelState(valid=False, message=f"Pothole has no property {param} to query by")
             query += " AND ".join([f"{param}=?" for param in query_params])
-        else:
-            return utils.ModelState(valid=False, message="Update Work Orders should have at least 2 parameters")
 
         records = super()._exec_dql_command(query, args=tuple(query_params.values()), return_one=False)
 
@@ -91,15 +109,16 @@ class WorkOrderMapper(SQLiteDataMapper):
         return utils.ModelState(valid=True, data=work_order)
 
     def update(self, query_params: dict):
-        query = """UPDATE WorkOrders"""
+        if len(query_params) < 2:
+            return utils.ModelState(valid=False, message="Update Work Order should have at least 2 parameters")
 
-        if len(query_params) > 0:
-            query += " SET "
+        query = """UPDATE WorkOrders SET """
 
-            for param in query_params:
-                if not entities.WorkOrder.has_property(param):
-                    return utils.ModelState(valid=False, message=f"Work Order has no property {param} to query by")
-            query += ", ".join([f"{param}=?" if param != "work_order_id" else "" for param in query_params])
+        # TODO: could this possibly introduce an SQL injection vulnerability?
+        for param in query_params:
+            if not entities.WorkOrder.has_property(param):
+                return utils.ModelState(valid=False, message=f"Work Order has no property {param} to query by")
+        query += ", ".join([f"{param}=?" if param != "work_order_id" else "" for param in query_params])
 
         query = query[:-2] + " WHERE work_order_id=?;"
 
