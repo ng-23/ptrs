@@ -16,7 +16,7 @@ that WSGI server will be used instead of Flask's default one.
 """
 
 
-def add_routable_controllers(flask_app: Flask):
+def add_routable_controllers(app: Flask):
     """
     A routable Controller is a Controller with an API route assigned to it
     These Controllers are intended to be interacted with by the user via HTTP request methods
@@ -45,7 +45,7 @@ def add_routable_controllers(flask_app: Flask):
 
         # see https://stackoverflow.com/questions/19261833/what-is-an-endpoint-in-flask
         # to understand how Flask defines and manages routes
-        flask_app.add_url_rule(
+        app.add_url_rule(
             url_rule,
             endpoint=controller_vars["endpoint"],
             view_func=controller_vars["controller_class"].as_view(

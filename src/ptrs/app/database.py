@@ -11,10 +11,7 @@ def get_db() -> sqlite3.Connection:
     """
 
     if "db" not in g:
-        g.db = sqlite3.connect(
-            current_app.config["DATABASE"],
-            detect_types=sqlite3.PARSE_DECLTYPES,
-        )
+        g.db = sqlite3.connect(current_app.config["DATABASE"], detect_types=sqlite3.PARSE_DECLTYPES)
         g.db.row_factory = sqlite3.Row
 
     return g.db
@@ -34,7 +31,7 @@ def init_db(schema: str | None = None):
     current_app.teardown_appcontext(close_db)
 
 
-def close_db(exception=None):
+def close_db(exception = None):
     db = g.pop("db", None)
 
     if db is not None:

@@ -29,13 +29,7 @@ class Entity:
 
 class Pothole(Entity):
     VALID_SIZES = set(range(1, 11))
-    VALID_LOCATIONS = {
-        "left_lane",
-        "right_lane",
-        "middle_lane",
-        "turn_lane",
-        "curbside",
-    }
+    VALID_LOCATIONS = {"left_lane", "right_lane", "middle_lane", "turn_lane", "curbside"}
     VALID_REPAIR_STATUSES = {"not repaired", "temporarily repaired", "repaired"}
     VALID_REPAIR_TYPES = {"asphalt", "concrete", "unknown"}
     VALID_REPAIR_PRIORITIES = {"major", "medium", "minor"}
@@ -55,7 +49,6 @@ class Pothole(Entity):
             expected_completion: str,
             pothole_id: int | None = None,
     ):
-        # see https://realpython.com/python-getter-setter/ for why/how to write getters and setters in Python
         self.pothole_id = pothole_id
         self.street_addr = street_addr
         self.latitude = latitude
@@ -136,18 +129,14 @@ class Pothole(Entity):
     @size.setter
     def size(self, size: int):
         if size not in self.VALID_SIZES:
-            raise ValueError(
-                f"Size must be one of {self.VALID_SIZES}, got '{size}' instead"
-            )
+            raise ValueError(f"Size must be one of {self.VALID_SIZES}, got '{size}' instead")
         self._size = size
 
     @location.setter
     def location(self, location: str):
         location = location.lower()
         if location not in self.VALID_LOCATIONS:
-            raise ValueError(
-                f"Location must be one of {self.VALID_LOCATIONS}, got '{location}' instead"
-            )
+            raise ValueError(f"Location must be one of {self.VALID_LOCATIONS}, got '{location}' instead")
         self._location = location
 
     @other_info.setter
@@ -158,27 +147,21 @@ class Pothole(Entity):
     def repair_status(self, repair_status: str):
         repair_status = repair_status.lower()
         if repair_status not in self.VALID_REPAIR_STATUSES:
-            raise ValueError(
-                f"Repair type must be one of {self.VALID_REPAIR_STATUSES}, got '{repair_status}' instead"
-            )
+            raise ValueError(f"Repair Status must be one of {self.VALID_REPAIR_STATUSES}, got '{repair_status}' instead")
         self._repair_status = repair_status
 
     @repair_type.setter
     def repair_type(self, repair_type: str):
         repair_type = repair_type.lower()
         if repair_type not in self.VALID_REPAIR_TYPES:
-            raise ValueError(
-                f"Repair type must be one of {self.VALID_REPAIR_TYPES}, got '{repair_type}' instead"
-            )
+            raise ValueError(f"Repair Type must be one of {self.VALID_REPAIR_TYPES}, got '{repair_type}' instead")
         self._repair_type = repair_type
 
     @repair_priority.setter
     def repair_priority(self, repair_priority: str):
         repair_priority = repair_priority.lower()
         if repair_priority not in self.VALID_REPAIR_PRIORITIES:
-            raise ValueError(
-                f"Repair priority must be one of {self.VALID_REPAIR_PRIORITIES}, got '{repair_priority}' instead"
-            )
+            raise ValueError(f"Repair Priority must be one of {self.VALID_REPAIR_PRIORITIES}, got '{repair_priority}' instead")
         self._repair_priority = repair_priority
 
     @report_date.setter
@@ -198,6 +181,8 @@ class Pothole(Entity):
 
 
 class WorkOrder(Entity):
+    VALID_REPAIR_STATUSES = {"not repaired", "temporarily repaired", "repaired"}
+
     def __init__(
             self,
             pothole_id: int,
@@ -246,6 +231,9 @@ class WorkOrder(Entity):
 
     @repair_status.setter
     def repair_status(self, repair_status: str):
+        repair_status = repair_status.lower()
+        if repair_status not in self.VALID_REPAIR_STATUSES:
+            raise ValueError(f"Repair Type must be one of {self.VALID_REPAIR_STATUSES}, got '{repair_status}' instead")
         self._repair_status = repair_status
 
     @estimated_man_hours.setter

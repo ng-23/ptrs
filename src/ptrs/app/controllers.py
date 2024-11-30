@@ -1,8 +1,8 @@
 from ptrs.app import views
 from ptrs.app import database
 from ptrs.app.model import services
-from flask.views import View
 from flask import request, Request, g
+from flask.views import View
 from abc import ABC, abstractmethod
 from datetime import datetime, date, timedelta
 
@@ -15,9 +15,7 @@ registered_controllers = {}
 def register_controller(name: str, service: services.Service, view: views.View):
     def decorator(controller_class: Controller):
         if controller_class in registered_controllers:
-            raise ValueError(
-                f"Controller class {controller_class} is already registered to a name, Service, and View."
-            )
+            raise ValueError(f"Controller class {controller_class} is already registered to a name, Service, and View.")
 
         registered_controllers[controller_class] = {
             "name": name,
@@ -39,9 +37,7 @@ routable_controllers = {}
 def register_routable_controller(url_rule: str, req_method: str):
     def decorator(controller_class: Controller):
         if (url_rule, req_method) in routable_controllers:
-            raise ValueError(
-                f"There is already a Controller associated with the URL rule {url_rule} and request method {req_method}"
-            )
+            raise ValueError(f"There is already a Controller associated with the URL rule {url_rule} and request method {req_method}")
 
         if controller_class not in registered_controllers:
             raise ValueError(f"{controller_class} is not registered as a Controller")
@@ -89,9 +85,7 @@ class Controller(ABC, View):
 class CreatePothole(Controller):
     methods = ["POST"]
 
-    def __init__(
-            self, service: services.CreatePothole, view: views.CreatePothole
-    ) -> None:
+    def __init__(self, service: services.CreatePothole, view: views.CreatePothole):
         self._service = service
         self._view = view
 
@@ -115,9 +109,7 @@ class CreatePothole(Controller):
         database.get_db()  # add a database connection to the current app/request context
         self._service.app_ctx = g  # point the Service to the current app/request context, from which it can get e.g. database connection
         self.update_request(request)
-        self._service.change_state(
-            request
-        )  # tell Service to process user's request and change state of Model layer
+        self._service.change_state(request)  # tell Service to process user's request and change state of Model layer
         return self._view.format_response()
 
 
@@ -126,9 +118,7 @@ class CreatePothole(Controller):
 class ReadPotholes(Controller):
     methods = ["GET"]
 
-    def __init__(
-            self, service: services.ReadPotholes, view: views.ReadPotholes
-    ) -> None:
+    def __init__(self, service: services.ReadPotholes, view: views.ReadPotholes):
         self._service = service
         self._view = view
 
@@ -139,10 +129,8 @@ class ReadPotholes(Controller):
         return self._view.format_response()
 
 
-@register_routable_controller("/workorder/", "POST")
-@register_controller(
-    "create_work_order", services.CreateWorkOrder, views.CreateWorkOrder
-)
+@register_routable_controller("/work-order/", "POST")
+@register_controller("create_work_order", services.CreateWorkOrder, views.CreateWorkOrder)
 class CreateWorkOrder(Controller):
     methods = ["POST"]
 
@@ -157,10 +145,8 @@ class CreateWorkOrder(Controller):
         return self._view.format_response()
 
 
-@register_routable_controller("/workorder/", "PATCH")
-@register_controller(
-    "update_work_order", services.UpdateWorkOrder, views.UpdateWorkOrder
-)
+@register_routable_controller("/work-order/", "PATCH")
+@register_controller("update_work_order", services.UpdateWorkOrder, views.UpdateWorkOrder)
 class UpdateWorkOrder(Controller):
     methods = ["PATCH"]
 
@@ -175,7 +161,7 @@ class UpdateWorkOrder(Controller):
         return self._view.format_response()
 
 
-@register_routable_controller("/workorders/", "GET")
+@register_routable_controller("/work-orders/", "GET")
 @register_controller("read_work_orders", services.ReadWorkOrders, views.ReadWorkOrders)
 class ReadWorkOrders(Controller):
     methods = ["GET"]

@@ -15,9 +15,7 @@ def register_view(name: str, service: services.Service):
 
     def decorator(view_class):
         if view_class in registered_views:
-            raise ValueError(
-                f"View class {view_class} is already registered to a name and Service"
-            )
+            raise ValueError(f"View class {view_class} is already registered to a name and Service")
 
         registered_views[view_class] = {"name": name, "service": service}
 

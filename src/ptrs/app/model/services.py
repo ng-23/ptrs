@@ -16,9 +16,7 @@ def register_service(name: str, *data_mappers: data_mappers.SQLiteDataMapper):
 
     def decorator(service_class):
         if service_class in registered_services:
-            raise ValueError(
-                f"Service class {service_class} is already registered to a name and list of DataMappers"
-            )
+            raise ValueError(f"Service class {service_class} is already registered to a name and list of DataMappers")
 
         registered_services[service_class] = {
             "name": name,
@@ -53,7 +51,7 @@ class Service(Observerable):
         self._app_ctx = app_ctx
 
     @abstractmethod
-    def change_state(self, request: Request, *args, **kwargs) -> None:
+    def change_state(self, request: Request, *args, **kwargs):
         pass
 
 
@@ -77,18 +75,15 @@ class CreatePothole(Service):
             try:
                 pothole = entities.Pothole(**request.json)
             except Exception as e:
-                self.notify_observers(
-                    ModelState(valid=False, message=str(e), errors=[e])
-                )
+                self.notify_observers(ModelState(valid=False, message=str(e), errors=[e]))
             else:
-                self.notify_observers(
-                    self._pothole_mapper.create(pothole), *args, **kwargs
-                )
+                self.notify_observers(self._pothole_mapper.create(pothole), *args, **kwargs)
         else:
             self.notify_observers(
                 ModelState(
                     valid=False,
-                    message=f"Request body must be of mimetype application/json and non-empty, got {request.mimetype} with length {request.content_length} instead",
+                    message=f"Request body must be of mimetype application/json and non-empty, "
+                            f"got {request.mimetype} with length {request.content_length} instead",
                 ),
             )
 
@@ -107,7 +102,7 @@ class ReadPotholes(Service):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
-    def change_state(self, request: Request, *args, **kwargs) -> None:
+    def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
 
         self.notify_observers(self._pothole_mapper.read(dict(request.args)))
@@ -133,18 +128,15 @@ class CreateWorkOrder(Service):
             try:
                 work_order = entities.WorkOrder(**request.json)
             except Exception as e:
-                self.notify_observers(
-                    ModelState(valid=False, message=str(e), errors=[e])
-                )
+                self.notify_observers(ModelState(valid=False, message=str(e), errors=[e]))
             else:
-                self.notify_observers(
-                    self._work_order_mapper.create(work_order), *args, **kwargs
-                )
+                self.notify_observers(self._work_order_mapper.create(work_order), *args, **kwargs)
         else:
             self.notify_observers(
                 ModelState(
                     valid=False,
-                    message=f"Request body must be of mimetype application/json and non-empty, got {request.mimetype} with length {request.content_length} instead",
+                    message=f"Request body must be of mimetype application/json and non-empty, "
+                            f"got {request.mimetype} with length {request.content_length} instead",
                 ),
             )
 
@@ -163,8 +155,10 @@ class UpdateWorkOrder(Service):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
-    def change_state(self, request: Request, *args, **kwargs) -> None:
+    def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
+
+        self.notify_observers(self._work_order_mapper.update(dict(request.json)))
 
 
 @register_service("read_work_orders", data_mappers.WorkOrderMapper)
@@ -181,7 +175,7 @@ class ReadWorkOrders(Service):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
-    def change_state(self, request: Request, *args, **kwargs) -> None:
+    def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
 
         self.notify_observers(self._work_order_mapper.read(dict(request.args)))
