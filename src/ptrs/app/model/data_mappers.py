@@ -101,8 +101,6 @@ class WorkOrderMapper(SQLiteDataMapper):
 
         query = query[:-2] + " WHERE work_order_id=?;"
 
-        print(query)
-
         super()._exec_dml_command(query, args=tuple(query_params.values()), update=True)
 
         query = """SELECT work_order_id,pothole_id,assignment_date,repair_status,estimated_man_hours FROM WorkOrders WHERE work_order_id=?"""
