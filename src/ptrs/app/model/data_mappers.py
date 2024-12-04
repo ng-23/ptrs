@@ -191,10 +191,12 @@ class PotholeMapper(SQLiteDataMapper):
             args=args, 
             do_insert=False,
             )
-                
+        
+        print(args[1])
+        print(self._build_read_statement(query_params=query_params))
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params), 
-            args=(args[1]), # index 1 contains the query parameters (don"t need the update fields for a select)
+            args=(args[1],), # index 1 contains the query parameters (don"t need the update fields for a select)
             return_one=False,
             )
 
@@ -356,7 +358,7 @@ class WorkOrderMapper(SQLiteDataMapper):
         
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params),
-            args=args[1],
+            args=(args[1],),
             return_one=False,
             )
 
