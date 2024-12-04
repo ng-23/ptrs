@@ -80,7 +80,7 @@ async function initMap() {
 			});
 	});
 
-	fetch("/potholes", {
+	fetch("/api/potholes", {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
@@ -134,7 +134,7 @@ async function initMap() {
 		let formData = new FormData(form);
 
 		// Report pothole use case
-		fetch("/pothole", {
+		fetch("/api/pothole", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

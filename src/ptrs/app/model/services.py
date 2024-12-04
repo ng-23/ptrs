@@ -1,9 +1,10 @@
-from ptrs.utils import Observer, Observerable, ModelState
+from ptrs.app import utils
 from ptrs.app.model import data_mappers, entities
 from flask import Request, ctx
 from abc import abstractmethod
+from datetime import datetime, date, timedelta
 
-# maps a Service class to a dict of {'name':str, 'data_mappers':[DataMapper]}
+# maps a Service class to a dict of {"name":str, "data_mappers":[DataMapper]}
 registered_services = {}
 
 
@@ -27,7 +28,7 @@ def register_service(name: str, *data_mappers: data_mappers.SQLiteDataMapper):
     return decorator
 
 
-class Service(Observerable):
+class Service(utils.Observable):
     """
     Services are part of the Model layer. They define specific interactions between the domain objects and application logic.
     It is Services that provide the functionality for e.g. logging in to a web app or creating a new account. Naturally, they
@@ -60,49 +61,37 @@ class CreatePothole(Service):
         self._pothole_mapper = pothole_mapper
         self._observers = []
 
-    def register_observer(self, observer: Observer):
+    def register_observer(self, observer: utils.Observer):
         self._observers.append(observer)
 
-    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
         if request.is_json and request.content_length > 0:
+            request.json.update({
+                "repair_status": "not repaired",
+                "repair_type":"unknown",
+                "repair_priority": ("major" if request.json["size"] >= 8 else "medium" if request.json["size"] >= 4 else "minor"),
+                "report_date": f"{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}",
+                "expected_completion": f"{(date.today() + timedelta(2)).strftime("%B %d, %Y")}",
+            })
             try:
                 pothole = entities.Pothole(**request.json)
             except Exception as e:
-                self.notify_observers(ModelState(valid=False, message=str(e), errors=[e]))
+                self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
             else:
                 self.notify_observers(self._pothole_mapper.create(pothole), *args, **kwargs)
         else:
             self.notify_observers(
-                ModelState(
+                utils.ModelState(
                     valid=False,
                     message=f"Request body must be of mimetype application/json and non-empty, "
                             f"got {request.mimetype} with length {request.content_length} instead",
                 ),
             )
-
-
-@register_service("update_pothole", data_mappers.PotholeMapper)
-class UpdatePothole(Service):
-    def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
-        super().__init__()
-        self._pothole_mapper = pothole_mapper
-        self._observers = []
-
-    def register_observer(self, observer: Observer):
-        self._observers.append(observer)
-
-    def notify_observers(self, model_state: ModelState, *args, **kwargs):
-        for observer in self._observers:
-            observer.notify(model_state, *args, **kwargs)
-
-    def change_state(self, request: Request, *args, **kwargs):
-        self._pothole_mapper.db = self._app_ctx.db
-        self.notify_observers(self._pothole_mapper.update(dict(request.json)))
 
 
 @register_service("read_potholes", data_mappers.PotholeMapper)
@@ -112,17 +101,48 @@ class ReadPotholes(Service):
         self._pothole_mapper = pothole_mapper
         self._observers = []
 
-    def register_observer(self, observer: Observer):
+    def register_observer(self, observer: utils.Observer):
         self._observers.append(observer)
 
-    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
-        self.notify_observers(self._pothole_mapper.read(dict(request.args)))
+        try:
+            query_params, sort_params = utils.distill_query_params(request)
+        except Exception as e:
+            self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
+        else:
+            self.notify_observers(self._pothole_mapper.read(query_params=query_params, sort_params=sort_params))
 
+
+@register_service("update_potholes", data_mappers.PotholeMapper)
+class UpdatePotholes(Service):
+    def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
+        super().__init__()
+        self._pothole_mapper = pothole_mapper
+        self._observers = []
+
+    def register_observer(self, observer: utils.Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs):
+        self._pothole_mapper.db = self._app_ctx.db
+        if request.is_json:
+            try:
+                query_params, _ = utils.distill_query_params(request) # sort params are unused here
+            except Exception as e:
+                self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
+            else:
+                self.notify_observers(self._pothole_mapper.update(query_params, request.json), *args, **kwargs)
+        else:
+            self.notify_observers(utils.ModelState(valid=False, message=f"Request body must be of mimetype application/json, got {request.mimetype} instead"))
 
 @register_service("create_work_order", data_mappers.WorkOrderMapper)
 class CreateWorkOrder(Service):
@@ -131,10 +151,10 @@ class CreateWorkOrder(Service):
         self._work_order_mapper = work_order_mapper
         self._observers = []
 
-    def register_observer(self, observer: Observer):
+    def register_observer(self, observer: utils.Observer):
         self._observers.append(observer)
 
-    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
@@ -144,36 +164,17 @@ class CreateWorkOrder(Service):
             try:
                 work_order = entities.WorkOrder(**request.json)
             except Exception as e:
-                self.notify_observers(ModelState(valid=False, message=str(e), errors=[e]))
+                self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
             else:
                 self.notify_observers(self._work_order_mapper.create(work_order), *args, **kwargs)
         else:
             self.notify_observers(
-                ModelState(
+                utils.ModelState(
                     valid=False,
                     message=f"Request body must be of mimetype application/json and non-empty, "
                             f"got {request.mimetype} with length {request.content_length} instead",
                 ),
             )
-
-
-@register_service("update_work_order", data_mappers.WorkOrderMapper)
-class UpdateWorkOrder(Service):
-    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
-        super().__init__()
-        self._work_order_mapper = work_order_mapper
-        self._observers = []
-
-    def register_observer(self, observer: Observer):
-        self._observers.append(observer)
-
-    def notify_observers(self, model_state: ModelState, *args, **kwargs):
-        for observer in self._observers:
-            observer.notify(model_state, *args, **kwargs)
-
-    def change_state(self, request: Request, *args, **kwargs):
-        self._work_order_mapper.db = self._app_ctx.db
-        self.notify_observers(self._work_order_mapper.update(dict(request.json)))
 
 
 @register_service("read_work_orders", data_mappers.WorkOrderMapper)
@@ -183,13 +184,46 @@ class ReadWorkOrders(Service):
         self._work_order_mapper = work_order_mapper
         self._observers = []
 
-    def register_observer(self, observer: Observer):
+    def register_observer(self, observer: utils.Observer):
         self._observers.append(observer)
 
-    def notify_observers(self, model_state: ModelState, *args, **kwargs):
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
         for observer in self._observers:
             observer.notify(model_state, *args, **kwargs)
 
     def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
-        self.notify_observers(self._work_order_mapper.read(dict(request.args)))
+        try:
+            query_params, sort_params = utils.distill_query_params(request)
+        except Exception as e:
+            self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
+        else:
+            self.notify_observers(self._work_order_mapper.read(query_params=query_params, sort_params=sort_params))
+
+
+@register_service("update_work_order", data_mappers.WorkOrderMapper)
+class UpdateWorkOrders(Service):
+    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
+        super().__init__()
+        self._work_order_mapper = work_order_mapper
+        self._observers = []
+
+    def register_observer(self, observer: utils.Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs):
+        self._work_order_mapper.db = self._app_ctx.db
+        if request.is_json:
+            try:
+                query_params, _ = utils.distill_query_params(request) # sort params are unused here
+            except Exception as e:
+                self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
+            else:
+                self.notify_observers(self._work_order_mapper.update(query_params, request.json), *args, **kwargs)
+        else:
+            self.notify_observers(utils.ModelState(valid=False, message=f"Request body must be of mimetype application/json, got {request.mimetype} instead"))
+

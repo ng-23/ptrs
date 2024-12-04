@@ -11,7 +11,7 @@ requires = ["hatchling"]
 
 [tool.pixi.project]
 channels = ["conda-forge"]
-platforms = ["linux-64"]
+platforms = ["linux-64","win-64"]
 
 [tool.pixi.pypi-dependencies]
 ptrs = { path = ".", editable = true }
@@ -20,5 +20,4 @@ ptrs = { path = ".", editable = true }
 
 [tool.pixi.dependencies]
 flask = ">=3.1.0,<4"
-gunicorn = ">=23.0.0,<24"
 python-dotenv = ">=1.0.1,<2"

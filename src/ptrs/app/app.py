@@ -15,7 +15,6 @@ If you run this module through a proper WSGI server (e.g. gunicorn),
 that WSGI server will be used instead of Flask's default one.
 """
 
-
 def add_routable_controllers(app: Flask):
     """
     A routable Controller is a Controller with an API route assigned to it
@@ -24,7 +23,7 @@ def add_routable_controllers(app: Flask):
     """
     for (url_rule, req_method), controller_vars in controllers.routable_controllers.items():
         data_mappers = [
-            data_mapper_class()
+            data_mapper_class(enable_foreign_keys=True) # TODO: consider making this an environment variable in the future
             for data_mapper_class in services.registered_services[controller_vars["service_class"]]["data_mappers"]
         ]  # instantiate DataMappers the Controller's Service depends on
         service = controller_vars["service_class"](*data_mappers)  # instantiate the Service the Controller and its View depend on

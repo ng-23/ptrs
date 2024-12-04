@@ -41,12 +41,12 @@ class Pothole(Entity):
             longitude: float,
             size: int,
             location: str,
-            other_info: str,
             repair_status: str,
             repair_type: str,
             repair_priority: str,
             report_date: str,
             expected_completion: str,
+            other_info: str = "",
             pothole_id: int | None = None,
     ):
         self.pothole_id = pothole_id
@@ -181,7 +181,7 @@ class Pothole(Entity):
 
 
 class WorkOrder(Entity):
-    VALID_REPAIR_STATUSES = {"not repaired", "temporarily repaired", "repaired"}
+    VALID_REPAIR_STATUSES = Pothole.VALID_REPAIR_STATUSES
 
     def __init__(
             self,
