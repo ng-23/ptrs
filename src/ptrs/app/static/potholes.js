@@ -88,7 +88,10 @@ async function initMap() {
 	})
 		.then((response) => response.text())
 		.then((data) => {
-			for (let pothole of JSON.parse(data).potholes) {
+			// Parse the JSON string into an object
+			let parsedData = JSON.parse(data);
+			console.log(parsedData.message);
+			for (let pothole of parsedData.data) {
 				// Create and style markers for previous reports
 				let pinBlue = new PinElement({
 					background: "#0000ff",
