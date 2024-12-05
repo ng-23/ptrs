@@ -76,7 +76,6 @@ class CreatePothole(Service):
                 "repair_type":"unknown",
                 "repair_priority": ("major" if request.json["size"] >= 8 else "medium" if request.json["size"] >= 4 else "minor"),
                 "report_date": f"{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}",
-                "expected_completion": f"{(date.today() + timedelta(2)).strftime("%B %d, %Y")}",
             })
             try:
                 pothole = entities.Pothole(**request.json)
@@ -201,7 +200,7 @@ class ReadWorkOrders(Service):
             self.notify_observers(self._work_order_mapper.read(query_params=query_params, sort_params=sort_params))
 
 
-@register_service("update_work_order", data_mappers.WorkOrderMapper)
+@register_service("update_work_orders", data_mappers.WorkOrderMapper)
 class UpdateWorkOrders(Service):
     def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
         super().__init__()
