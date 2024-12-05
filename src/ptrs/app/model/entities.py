@@ -45,7 +45,6 @@ class Pothole(Entity):
             repair_type: str,
             repair_priority: str,
             report_date: str,
-            expected_completion: str,
             other_info: str = "",
             pothole_id: int | None = None,
     ):
@@ -60,7 +59,6 @@ class Pothole(Entity):
         self.repair_type = repair_type
         self.repair_priority = repair_priority
         self.report_date = report_date
-        self.expected_completion = expected_completion
 
     @property
     def pothole_id(self):
@@ -105,10 +103,6 @@ class Pothole(Entity):
     @property
     def report_date(self):
         return self._report_date
-
-    @property
-    def expected_completion(self):
-        return self._expected_completion
 
     @pothole_id.setter
     def pothole_id(self, pothole_id: int | None):
@@ -168,10 +162,6 @@ class Pothole(Entity):
     def report_date(self, report_date: str):
         self._report_date = report_date
 
-    @expected_completion.setter
-    def expected_completion(self, expected_completion: str):
-        self._expected_completion = expected_completion
-
     def to_tuple(self, incl_id=False):
         attrs = super().to_tuple()
         if incl_id:
@@ -189,6 +179,8 @@ class WorkOrder(Entity):
             assignment_date: str,
             repair_status: str,
             estimated_man_hours: int,
+            expected_completion: str,
+            notes: str = "",
             work_order_id: int | None = None,
     ):
         self.work_order_id = work_order_id
@@ -196,6 +188,8 @@ class WorkOrder(Entity):
         self.assignment_date = assignment_date
         self.repair_status = repair_status
         self.estimated_man_hours = estimated_man_hours
+        self.expected_completion = expected_completion
+        self.notes = notes
 
     @property
     def work_order_id(self):
@@ -216,6 +210,14 @@ class WorkOrder(Entity):
     @property
     def estimated_man_hours(self):
         return self._estimated_man_hours
+    
+    @property
+    def expected_completion(self):
+        return self._expected_completion
+    
+    @property
+    def notes(self):
+        return self._notes
 
     @work_order_id.setter
     def work_order_id(self, work_order_id: int | None):
@@ -239,6 +241,14 @@ class WorkOrder(Entity):
     @estimated_man_hours.setter
     def estimated_man_hours(self, estimated_man_hours: int):
         self._estimated_man_hours = estimated_man_hours
+
+    @expected_completion.setter
+    def expected_completion(self, expected_completion:str):
+        self._expected_completion = expected_completion
+
+    @notes.setter
+    def notes(self, notes:str):
+        self._notes = notes
 
     def to_tuple(self, incl_id=False):
         attrs = super().to_tuple()
