@@ -12,8 +12,7 @@ CREATE TABLE Potholes (
     repair_status TEXT NOT NULL,
     repair_type TEXT NOT NULL,
     repair_priority TEXT NOT NULL,
-    report_date TEXT NOT NULL,
-    expected_completion TEXT NOT NULL
+    report_date TEXT NOT NULL
 );
 
 CREATE TABLE WorkOrders (
@@ -22,5 +21,7 @@ CREATE TABLE WorkOrders (
     assignment_date TEXT NOT NULL,
     repair_status TEXT NOT NULL,
     estimated_man_hours INTEGER NOT NULL,
+    expected_completion TEXT NOT NULL,
+    notes TEXT,
     FOREIGN KEY (pothole_id) REFERENCES Potholes (pothole_id)
 );
