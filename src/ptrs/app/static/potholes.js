@@ -1,3 +1,25 @@
+/**
+ * Creates a control to recenter the map on Indiana County.
+ */
+function createCenterControl(map, myLatLng) {
+	const controlButton = document.createElement("button");
+
+	// Set CSS for the control.
+	controlButton.innerHTML = "<i class=\"fa fa-home\"></i>";
+	controlButton.title = "Recenter";
+	controlButton.type = "button";
+	controlButton.id = "homeButton";
+	// Setup the click event listeners: simply set the map to Indiana County.
+	controlButton.addEventListener("click", () => {
+		map.setCenter(myLatLng);
+		map.setZoom(10);
+	});
+	return controlButton;
+}
+
+/**
+ * Function that will be called by map API
+ */
 async function initMap() {
 	// Import libraries
 	const { Map } = await google.maps.importLibrary("maps");
@@ -11,11 +33,29 @@ async function initMap() {
 		zoom: 10,
 		minZoom: 10,
 		maxZoom: 20,
+		restriction: {
+			latLngBounds: {
+				north: 41,
+				south: 40,
+				west: -80,
+				east: -78,
+			},
+			strictBounds: false,
+		},
 		mapId: "c894f5bb0ee453ef",
 		disableDefaultUI: true,
 		zoomControl: true,
 		clickableIcons: false,
 	});
+
+	// Create the DIV to hold the control.
+	const centerControlDiv = document.createElement("div");
+	centerControlDiv.id = "mapControls";
+	// Create the control.
+	const centerControl = createCenterControl(map, myLatLng);
+	// Append the control to the DIV.
+	centerControlDiv.appendChild(centerControl);
+	map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(centerControlDiv);
 
 	// Feature layer adds outline on map of Indiana County
 	const featureLayer = map.getFeatureLayer("ADMINISTRATIVE_AREA_LEVEL_2");
@@ -59,21 +99,23 @@ async function initMap() {
 					if (component.types.includes("administrative_area_level_2")) {
 						let county = component.long_name;
 
+						// Throw error and reset address if user clicks outside of Indiana County
 						if (county !== "Indiana County") {
 							marker = new AdvancedMarkerElement({
 								map,
 								content: pinRed.element,
 							});
+							newPotholeAddress = { latitude: 0, longitude: 0, address: "" };
 
-							alert("Chosen pin is not within Indiana County!");
-							throw new Error("Chosen pin is not within Indiana County!");
+							alert("Chosen pin is not within Indiana County");
+							throw new Error("Chosen pin is not within Indiana County");
 						}
 					}
 				}
 
-				let address = response.results[0].formatted_address.replace(", USA", "");
-				document.querySelector("#address").value = address;
-				newPotholeAddress.address = address;
+				// Add address to form
+				newPotholeAddress.address = response.results[0].formatted_address.replace(", USA", "");
+				document.querySelector("#address").value = newPotholeAddress.address;
 			})
 			.catch((error) => {
 				console.error("Error:", error);
@@ -90,7 +132,7 @@ async function initMap() {
 		.then((data) => {
 			// Parse the JSON string into an object
 			let parsedData = JSON.parse(data);
-			console.log(parsedData.message);
+
 			for (let pothole of parsedData.data) {
 				// Create and style markers for previous reports
 				let pinBlue = new PinElement({
@@ -113,7 +155,7 @@ async function initMap() {
 					let descriptions = document.querySelectorAll(".viewDescription");
 					let values = [
 						pothole.street_addr,
-						pothole.size,
+						pothole.size + "/10",
 						pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase()),
 						pothole.report_date,
 						pothole.expected_completion,
@@ -132,11 +174,19 @@ async function initMap() {
 		});
 
 	const form = document.querySelector("#newPotholeForm");
-	form.addEventListener("submit", function () {
+	form.addEventListener("submit", function (e) {
+		if (newPotholeAddress.address === "") {
+			e.preventDefault();
+			alert("Please enter an address using the map");
+			console.error("Please enter a valid address using the map");
+			return;
+		}
+
 		// Variables
 		let formData = new FormData(form);
 
 		// Report pothole use case
+		// HTTP Post to Flask server
 		fetch("/api/pothole", {
 			method: "POST",
 			headers: {

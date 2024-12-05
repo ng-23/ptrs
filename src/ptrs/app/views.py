@@ -52,8 +52,7 @@ class CreatePothole(View):
         if not self._model_state.valid:
             status = 404
 
-        data = {"message":self._model_state.message}
-        data["data"] = []
+        data = {"message": self._model_state.message, "data": []}
 
         for item in self._model_state.data:
             if isinstance(item, entities.Entity):
@@ -79,8 +78,7 @@ class ReadPotholes(View):
         if not self._model_state.valid:
             status = 404
 
-        data = {"message":self._model_state.message}
-        data["data"] = []
+        data = {"message": self._model_state.message, "data": []}
 
         for item in self._model_state.data:
             if isinstance(item, entities.Entity):
@@ -106,8 +104,7 @@ class UpdatePotholes(View):
         if not self._model_state.valid:
             status = 404
 
-        data = {"message":self._model_state.message}
-        data["data"] = []
+        data = {"message": self._model_state.message, "data": []}
 
         for item in self._model_state.data:
             if isinstance(item, entities.Entity):
@@ -133,8 +130,7 @@ class CreateWorkOrder(View):
         if not self._model_state.valid:
             status = 404
 
-        data = {"message":self._model_state.message}
-        data["data"] = []
+        data = {"message": self._model_state.message, "data": []}
 
         for item in self._model_state.data:
             if isinstance(item, entities.Entity):
@@ -160,8 +156,7 @@ class ReadWorkOrders(View):
         if not self._model_state.valid:
             status = 404
 
-        data = {"message":self._model_state.message}
-        data["data"] = []
+        data = {"message": self._model_state.message, "data": []}
 
         for item in self._model_state.data:
             if isinstance(item, entities.Entity):
@@ -187,8 +182,7 @@ class UpdateWorkOrders(View):
         if not self._model_state.valid:
             status = 404
 
-        data = {"message":self._model_state.message}
-        data["data"] = []
+        data = {"message": self._model_state.message, "data": []}
 
         for item in self._model_state.data:
             if isinstance(item, entities.Entity):

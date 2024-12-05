@@ -38,7 +38,6 @@ class SQLiteDataMapper:
         """
         cursor = self._db.execute(stmt, args)
         self._db.commit()
-        res = None
 
         if do_insert:
             # applies only to INSERT
@@ -57,7 +56,8 @@ class PotholeMapper(SQLiteDataMapper):
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
 
-    def _check_invalid_fields(self, fields:list) -> list:
+    @staticmethod
+    def _check_invalid_fields(fields:list) -> list:
         invalid_fields = [] # empty if all fields are valid
 
         for field in fields:
@@ -75,13 +75,17 @@ class PotholeMapper(SQLiteDataMapper):
 
         return non_updatable_fields
     
-    def _build_read_statement(self, query_params:dict={}, sort_params:dict={}):
+    def _build_read_statement(self, query_params=None, sort_params=None):
         """
         Prepares a read statement from the given query and sort parameters
 
         If no query parameters are provided, a statement to select all Potholes will be returned
         """
 
+        if sort_params is None:
+            sort_params = {}
+        if query_params is None:
+            query_params = {}
         stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
 
@@ -147,18 +151,22 @@ class PotholeMapper(SQLiteDataMapper):
         query = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion) VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
 
-        id = super()._exec_dml_command(query, args=pothole.to_tuple(incl_id=False), do_insert=True)
-        pothole.pothole_id = id
+        pothole_id = super()._exec_dml_command(query, args=pothole.to_tuple(incl_id=False), do_insert=True)
+        pothole.pothole_id = pothole_id
 
-        return utils.ModelState(valid=True, message=f"Successfully created new Pothole with id {id}", data=[pothole])
+        return utils.ModelState(valid=True, message=f"Successfully created new Pothole with id {pothole_id}", data=[pothole])
 
-    def read(self, query_params:dict={}, sort_params:dict={}):
+    def read(self, query_params=None, sort_params=None):
         """
-        Select 1 or more exisiting Potholes from the database
+        Select 1 or more existing Potholes from the database
 
         If no query parameters are specified, all Potholes are selected.
         """
 
+        if sort_params is None:
+            sort_params = {}
+        if query_params is None:
+            query_params = {}
         try:
             stmt = self._build_read_statement(query_params=query_params, sort_params=sort_params)
         except Exception as e:
@@ -196,7 +204,7 @@ class PotholeMapper(SQLiteDataMapper):
         print(self._build_read_statement(query_params=query_params))
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params), 
-            args=(args[1],), # index 1 contains the query parameters (don"t need the update fields for a select)
+            args=(args[1],), # index 1 contains the query parameters (don't need the update fields for a select)
             return_one=False,
             )
 
@@ -213,7 +221,8 @@ class WorkOrderMapper(SQLiteDataMapper):
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
 
-    def _check_invalid_fields(self, fields:list) -> list:
+    @staticmethod
+    def _check_invalid_fields(fields:list) -> list:
         invalid_fields = []
 
         for field in fields:
@@ -231,14 +240,19 @@ class WorkOrderMapper(SQLiteDataMapper):
 
         return non_updatable_fields
     
-    def _build_read_statement(self, query_params:dict={}, sort_params:dict={}):
+    def _build_read_statement(self, query_params=None, sort_params=None):
         """
         Prepares a read statement from the given query and sort parameters
 
         If no query parameters are provided, a statement to select all Work Orders will be returned
         """
 
-        stmt = """SELECT work_order_id,pothole_id,assignment_date,repair_status,estimated_man_hours FROM WorkOrders"""
+        if sort_params is None:
+            sort_params = {}
+        if query_params is None:
+            query_params = {}
+        stmt = """SELECT work_order_id,pothole_id,assignment_date,expected_completion,size,location,other_info,
+        repair_priority,repair_type,estimated_man_hours,repair_status FROM WorkOrders"""
 
         if len(query_params) > 0:
             stmt += " WHERE "
@@ -296,24 +310,29 @@ class WorkOrderMapper(SQLiteDataMapper):
         Insert a new Work Order into the database
         """
 
-        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,repair_status,estimated_man_hours) VALUES (?,?,?,?)"""
+        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,expected_completion,size,location,
+        other_info,repair_priority,repair_type,estimated_man_hours,repair_status) VALUES (?,?,?,?,?,?,?,?,?,?)"""
 
-        id = super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
-        work_order.work_order_id = id
+        work_order_id = super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
+        work_order.work_order_id = work_order_id
 
         return utils.ModelState(
             valid=True, 
-            message=f"Successfully created new Work Order with id {id}", 
+            message=f"Successfully created new Work Order with id {work_order_id}",
             data=[work_order],
             )
 
-    def read(self, query_params: dict={}, sort_params:dict={}):
+    def read(self, query_params=None, sort_params=None):
         """
         Select 1 or more existing Work Orders from the database
 
         If no query parameters are specified, all Work Orders will be selected
         """
 
+        if sort_params is None:
+            sort_params = {}
+        if query_params is None:
+            query_params = {}
         try:
             stmt = self._build_read_statement(query_params=query_params, sort_params=sort_params)
         except Exception as e:

@@ -4,7 +4,8 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>PTRS</title>
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='potholes.css') }}" />
 	<link href="https://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" />
 </head>
 <body>
@@ -20,51 +21,46 @@
 	</div>
 	<div class="card submitCard">
 		<form id="newPotholeForm">
-			<div class="formRow">
-				<h1>New Report</h1>
-			</div>
-			<div class="formRow">
-				<label for="address"> Street Address: </label>
-				<input type="text" id="address" name="address" value="None Selected" disabled />
-			</div>
-			<div class="formRow">
-				<label for="size"> Size: </label>
-				<input type="range" id="size" name="size" step="10" min="10" max="100" />
-			</div>
-			<div class="formRow">
-				<label for="location"> Location In the Street: </label>
-				<select id="location" name="location">
-					<option value="left_lane">Left Lane</option>
-					<option value="right_lane">Right Lane</option>
-					<option value="middle_lane">Middle Lane</option>
-					<option value="turn_lane">Turn Lane</option>
-					<option value="curbside">Curbside</option>
-				</select>
-			</div>
-			<div class="formRow">
-				<label for="other"> Other Necessary Information: </label><br />
-				<textarea id="other" name="other" placeholder="Type Here"></textarea>
-			</div>
-			<div class="formRow">
-				<input type="submit" value="Submit" />
-			</div>
+					<span class="formRow">
+						<h1>New Report</h1>
+					</span>
+			<span class="formRow">
+						<label for="address"> Street Address: </label>
+						<input type="text" id="address" name="address" value="None Selected" autocomplete="off" disabled />
+					</span>
+			<span class="formRow">
+						<label for="size"> Size: </label>
+						<input type="range" id="size" name="size" step="10" min="10" max="100" />
+					</span>
+			<span class="formRow">
+						<label for="location"> Location In the Street: </label>
+						<select id="location" name="location">
+							<option value="left_lane">Left Lane</option>
+							<option value="right_lane">Right Lane</option>
+							<option value="middle_lane">Middle Lane</option>
+							<option value="turn_lane">Turn Lane</option>
+							<option value="curbside">Curbside</option>
+						</select>
+					</span>
+			<span class="formRow">
+						<label for="other"> Other Necessary Information: </label><br />
+						<textarea id="other" name="other" placeholder="Type Here"></textarea>
+					</span>
+			<span class="formRow">
+						<input type="submit" value="Submit" />
+					</span>
 		</form>
 	</div>
 	<div class="card viewCard">
 		<h1>Selected Report</h1>
-		<!-- Address -->
 		<span class="viewLabel" style="display: none">Street Address:</span>
 		<span class="viewDescription" style="display: none"></span>
-		<!-- Size -->
 		<span class="viewLabel" style="display: none">Size</span>
 		<span class="viewDescription" style="display: none"></span>
-		<!-- Repair Status -->
 		<span class="viewLabel" style="display: none">Repair Status:</span>
 		<span class="viewDescription" style="display: none"></span>
-		<!-- Report Date -->
 		<span class="viewLabel" style="display: none">Report Date:</span>
 		<span class="viewDescription" style="display: none"></span>
-		<!-- Expected Completion Date -->
 		<span class="viewLabel" style="display: none">Expected Completion Date:</span>
 		<span class="viewDescription" style="display: none"></span>
 	</div>

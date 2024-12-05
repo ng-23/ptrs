@@ -1,0 +1,250 @@
+/* Standard HTML elements */
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	background-color: #f5f5f5;
+	font-family: "Open Sans", serif;
+}
+
+/* Grid */
+
+.gridContainer {
+	width: 1100px;
+	height: 92vh;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 4vh 0 4vh 0;
+	display: grid;
+	grid-template-columns: 650px 430px;
+	grid-template-rows: 75px 375px 450px;
+	gap: 15px;
+}
+
+/* Cards */
+
+.card {
+	background-color: #ffffff;
+	border-radius: 10px;
+	box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+	overflow: hidden;
+}
+
+.mapCard {
+	grid-column-start: 1;
+	grid-column-end: 3;
+	grid-row-start: 1;
+	grid-row-end: 3;
+}
+
+.submitCard {
+	padding: 25px 50px 25px 50px;
+	grid-column-start: 1;
+	grid-column-end: 2;
+	grid-row-start: 3;
+	grid-row-end: 4;
+}
+
+.mapHelpCard {
+	padding: 10px 40px 10px 40px;
+	background-color: rgba(255, 255, 255, 0.75);
+	z-index: 1;
+	grid-column-start: 2;
+	grid-column-end: 3;
+	grid-row-start: 1;
+	grid-row-end: 2;
+}
+
+.viewCard {
+	padding: 25px 40px 25px 40px;
+	grid-column-start: 2;
+	grid-column-end: 3;
+	grid-row-start: 3;
+	grid-row-end: 4;
+}
+
+/* Map */
+
+#map {
+	width: 100%;
+	height: 100%;
+	border-radius: 10px;
+}
+
+.mapHelpText {
+	margin: 0;
+	position: relative;
+	top: 50%;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+#mapControls {
+	margin-right: 10px;
+}
+
+#homeButton {
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	background-color: #ffffff;
+	border: none;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	text-align: center;
+	font-size: 2.1em;
+	color: rgb(85, 89, 92);
+	cursor: pointer;
+}
+
+#homeButton:hover {
+	color: rgb(40, 44, 47);
+}
+
+/* Submit Pothole */
+
+.formRow {
+	width: 100%;
+	min-height: 50px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.formRow > h1 {
+	margin: 0 auto auto auto;
+	padding-bottom: 10px;
+	text-align: center;
+	font-size: 24px;
+}
+
+.formRow > label {
+	height: 50px;
+	line-height: 50px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: text;
+}
+
+.formRow > #address,
+.formRow > #size {
+	max-width: 400px;
+	margin-left: auto;
+	text-align: right;
+}
+
+.formRow > #address {
+	width: 400px;
+	height: 40px;
+	padding: 5px 0 5px 10px;
+	border: none;
+	font-family: "Open Sans", serif;
+	font-size: 16px;
+}
+
+.formRow > #address:disabled {
+	background: none;
+	color: #000000;
+	cursor: text;
+}
+
+.formRow > #size {
+	width: 300px;
+	margin-right: 0;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.formRow > #size:focus {
+	outline: none;
+}
+
+.formRow > #size::-webkit-slider-runnable-track {
+	height: 8px;
+	background-color: #d9dddc;
+	border-radius: 0.5rem;
+}
+
+.formRow > #size::-webkit-slider-thumb {
+	width: 24px;
+	height: 24px;
+	margin-top: -8px;
+	border-radius: 12px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	background-color: #ffffff;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.formRow > #location,
+.formRow > #other {
+	border: 1px solid #ccc;
+	box-sizing: border-box;
+	font-family: "Open Sans", serif;
+	font-size: 16px;
+}
+
+.formRow > #location:focus,
+.formRow > #other:focus {
+	outline: none;
+}
+
+.formRow > #location {
+	width: 125px;
+	height: 40px;
+	margin-left: auto;
+	text-align: center;
+	cursor: pointer;
+}
+
+.formRow > #other {
+	width: 100%;
+	height: 100px;
+	padding: 5px 10px;
+	resize: none;
+	overflow-y: scroll;
+}
+
+.formRow > input[type="submit"] {
+	margin-left: auto;
+	margin-top: auto;
+	padding: 5px 10px 5px 10px;
+	background-color: #007aff;
+	border: none;
+	border-radius: 25px;
+	font-family: "Open Sans", serif;
+	font-size: 16px;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.formRow > input[type="submit"]:hover {
+	background-color: #1e90ff;
+}
+
+/* View Pothole */
+
+.viewCard > h1 {
+	margin: 0;
+	padding-bottom: 10px;
+	text-align: center;
+	font-size: 24px;
+}
+
+.viewLabel {
+	height: 35px;
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 35px;
+}
+.viewDescription {
+	height: 35px;
+	padding-left: 20px;
+	font-size: 16px;
+	line-height: 35px;
+	overflow: hidden;
+}
