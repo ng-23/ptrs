@@ -156,7 +156,7 @@ class ReadWorkOrders(Controller):
         return self._view.format_response()
 
 
-@register_routable_controller(f"{API_ROUTE_PREFIX}/work-order/", "PATCH")
+@register_routable_controller(f"{API_ROUTE_PREFIX}/work-orders/", "PATCH")
 @register_controller("update_work_orders", services.UpdateWorkOrders, views.UpdateWorkOrders)
 class UpdateWorkOrders(Controller):
     methods = ["PATCH"]
