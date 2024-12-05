@@ -83,14 +83,16 @@ class PotholeMapper(SQLiteDataMapper):
         """
 
         stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
-        repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
+        repair_type,repair_priority,report_date FROM Potholes"""
 
         if len(query_params) > 0:
             stmt += " WHERE "
 
             invalid_params = self._check_invalid_fields(list(query_params.keys()))
             if len(invalid_params) != 0:
-                raise exceptions.InvalidQueryParams({"message":f"{len(invalid_params)} are not queryable fields of Potholes", "data":invalid_params})
+                raise exceptions.InvalidQueryParams(
+                    {"message":f"{len(invalid_params)} query parameters are not fields of Potholes", "data":invalid_params},
+                    )
             
             # TODO: could this possibly introduce a SQL injection vulnerability?
             stmt += " AND ".join([f"{param} {query_params[param]["filter"]} ?" for param in query_params])
@@ -100,7 +102,9 @@ class PotholeMapper(SQLiteDataMapper):
 
             invalid_params = self._check_invalid_fields(list(sort_params.keys()))
             if len(invalid_params) != 0:
-                raise exceptions.InvalidSortParams({"message":f"{len(invalid_params)} are not sortable fields of Potholes", "data":invalid_params})
+                raise exceptions.InvalidSortParams(
+                    {"message":f"{len(invalid_params)} sort parameters are not fields of Potholes", "data":invalid_params},
+                    )
 
             stmt += ", ".join([f"{param} {sort_params[param]}" for param in sort_params]) # TODO: possible SQL injection issue?
 
@@ -114,23 +118,33 @@ class PotholeMapper(SQLiteDataMapper):
         stmt = """UPDATE Potholes SET """
 
         if len(query_params) == 0:
-            raise exceptions.InvalidQueryParams({"message":"Cannot find Potholes to update as no query parameters were specified", "data":[]})
+            raise exceptions.InvalidQueryParams(
+                {"message":"Cannot find Potholes to update as no query parameters were specified", "data":[]},
+                )
         
         if len(update_fields) == 0:
-            raise exceptions.InvalidUpdateFields({"message":"Must specify at least 1 Pothole field to update", "data":[]})
+            raise exceptions.InvalidUpdateFields(
+                {"message":"Must specify at least 1 Pothole field to update", "data":[]},
+                )
         
 
         invalid_fields = self._check_non_updatable_fields(list(update_fields.keys()))
         if len(invalid_fields) != 0:
-            raise exceptions.InvalidUpdateFields({"message":f"{len(invalid_fields)} fields are not updatable fields of Potholes", "data":invalid_fields})
+            raise exceptions.InvalidUpdateFields(
+                {"message":f"{len(invalid_fields)} fields are not updatable fields of Potholes", "data":invalid_fields},
+                )
 
         invalid_fields = self._check_invalid_fields(list(update_fields.keys()))
         if len(invalid_fields) != 0:
-            raise exceptions.InvalidUpdateFields({"message":f"{len(invalid_fields)} are not updatable fields of Potholes", "data":invalid_fields})
+            raise exceptions.InvalidUpdateFields(
+                {"message":f"{len(invalid_fields)} fields are not fields of Potholes", "data":invalid_fields},
+                )
 
         invalid_params = self._check_invalid_fields(list(query_params.keys()))
         if len(invalid_params) != 0:
-            raise exceptions.InvalidQueryParams({"message":f"{len(invalid_params)} are not queryable fields of Potholes", "data":invalid_params})
+            raise exceptions.InvalidQueryParams(
+                {"message":f"{len(invalid_params)} query parameters are not fields of Potholes", "data":invalid_params},
+                )
         
         stmt += ", ".join([f"{field} = ?" for field in update_fields])
 
@@ -144,10 +158,10 @@ class PotholeMapper(SQLiteDataMapper):
         Insert a new Pothole into the database
         """
 
-        query = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,
-        repair_type,repair_priority,report_date,expected_completion) VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
+        stmt = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,
+        repair_type,repair_priority,report_date) VALUES (?,?,?,?,?,?,?,?,?,?)"""
 
-        id = super()._exec_dml_command(query, args=pothole.to_tuple(incl_id=False), do_insert=True)
+        id = super()._exec_dml_command(stmt, args=pothole.to_tuple(incl_id=False), do_insert=True)
         pothole.pothole_id = id
 
         return utils.ModelState(valid=True, message=f"Successfully created new Pothole with id {id}", data=[pothole])
@@ -191,9 +205,7 @@ class PotholeMapper(SQLiteDataMapper):
             args=args, 
             do_insert=False,
             )
-        
-        print(args[1])
-        print(self._build_read_statement(query_params=query_params))
+
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params), 
             args=(args[1],), # index 1 contains the query parameters (don"t need the update fields for a select)
@@ -238,14 +250,16 @@ class WorkOrderMapper(SQLiteDataMapper):
         If no query parameters are provided, a statement to select all Work Orders will be returned
         """
 
-        stmt = """SELECT work_order_id,pothole_id,assignment_date,repair_status,estimated_man_hours FROM WorkOrders"""
+        stmt = """SELECT work_order_id,pothole_id,assignment_date,repair_status,estimated_man_hours,expected_completion,notes FROM WorkOrders"""
 
         if len(query_params) > 0:
             stmt += " WHERE "
 
             invalid_params = self._check_invalid_fields(list(query_params.keys()))
             if len(invalid_params) != 0:
-                raise exceptions.InvalidQueryParams({"message":f"{len(invalid_params)} are not queryable fields of Work Orders", "data":invalid_params})
+                raise exceptions.InvalidQueryParams(
+                    {"message":f"{len(invalid_params)} query parameters are not fields of Work Orders", "data":invalid_params},
+                    )
             stmt += " AND ".join([f"{param}=?" for param in query_params])
 
         if len(sort_params) > 0:
@@ -253,7 +267,9 @@ class WorkOrderMapper(SQLiteDataMapper):
 
             invalid_params = self._check_invalid_fields(list(sort_params.keys()))
             if len(invalid_params) != 0:
-                raise exceptions.InvalidSortParams({"message":f"{len(invalid_params)} are not sortable fields of Work Orders", "data":invalid_params})
+                raise exceptions.InvalidSortParams(
+                    {"message":f"{len(invalid_params)} sort parameters are not fields of Work Orders", "data":invalid_params},
+                    )
 
             stmt += ", ".join([f"{param} {sort_params[param]}" for param in sort_params])
 
@@ -280,25 +296,31 @@ class WorkOrderMapper(SQLiteDataMapper):
 
         invalid_fields = self._check_invalid_fields(list(update_fields.keys()))
         if len(invalid_fields) != 0:
-            return utils.ModelState(valid=False, message=f"{len(invalid_fields)} are not updatable fields of Work Orders", data=invalid_fields),
+            raise exceptions.InvalidUpdateFields(
+                {"message":f"{len(invalid_fields)} fields are not fields of Work Orders", "data":invalid_fields},
+                )
 
         invalid_params = self._check_invalid_fields(list(query_params.keys()))
         if len(invalid_params) != 0:
-            return utils.ModelState(valid=False, message=f"{len(invalid_params)} are not queryable fields of Work Orders", data=invalid_params)
+            raise exceptions.InvalidUpdateFields(
+                {"message":f"{len(invalid_params)} query parameters are not fields of Work Orders", "data":invalid_params},
+                )
         
-        stmt += ", ".join([f"{field}=?" for field in update_fields]) # add the fields to update to the query
+        stmt += ", ".join([f"{field}=?" for field in update_fields])
 
         stmt += " WHERE "
-        stmt += " AND ".join([f"{param}=?" for param in query_params]) # add the fields to filter by to the query
+        stmt += " AND ".join([f"{param}=?" for param in query_params])
+
+        return stmt
 
     def create(self, work_order: entities.WorkOrder) -> entities.WorkOrder:
         """
         Insert a new Work Order into the database
         """
 
-        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,repair_status,estimated_man_hours) VALUES (?,?,?,?)"""
+        stmt = """INSERT INTO WorkOrders (pothole_id,assignment_date,repair_status,estimated_man_hours,expected_completion,notes) VALUES (?,?,?,?,?,?)"""
 
-        id = super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
+        id = super()._exec_dml_command(stmt, args=work_order.to_tuple(incl_id=False))
         work_order.work_order_id = id
 
         return utils.ModelState(
@@ -348,7 +370,7 @@ class WorkOrderMapper(SQLiteDataMapper):
                 data=e.args[0]["data"],
                 )
         
-        args = tuple(list(update_fields.values()) + list(query_params.values()))
+        args = tuple(list(update_fields.values()) + [query_params[param]["val"] for param in query_params])
 
         num_updated = super()._exec_dml_command(
             stmt, 
