@@ -19,6 +19,9 @@ CREATE TABLE Potholes (
 CREATE TABLE WorkOrders (
     work_order_id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
     pothole_id INTEGER NOT NULL UNIQUE,
+    street_addr TEXT NOT NULL,
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
     assignment_date TEXT NOT NULL,
     expected_completion TEXT NOT NULL,
     size INTEGER NOT NULL,

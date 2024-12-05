@@ -186,6 +186,9 @@ class WorkOrder(Entity):
     def __init__(
             self,
             pothole_id: int,
+            street_addr: str,
+            latitude: float,
+            longitude: float,
             assignment_date: str,
             expected_completion: str,
             size: int,
@@ -199,6 +202,9 @@ class WorkOrder(Entity):
     ):
         self.work_order_id = work_order_id
         self.pothole_id = pothole_id
+        self.street_addr = street_addr
+        self.latitude = latitude
+        self.longitude = longitude
         self.assignment_date = assignment_date
         self.expected_completion = expected_completion
         self.size = size
@@ -216,6 +222,18 @@ class WorkOrder(Entity):
     @property
     def pothole_id(self):
         return self._pothole_id
+
+    @property
+    def street_addr(self):
+        return self._street_addr
+
+    @property
+    def latitude(self):
+        return self._latitude
+
+    @property
+    def longitude(self):
+        return self._longitude
 
     @property
     def assignment_date(self):
@@ -260,6 +278,18 @@ class WorkOrder(Entity):
     @pothole_id.setter
     def pothole_id(self, pothole_id: int):
         self._pothole_id = pothole_id
+
+    @street_addr.setter
+    def street_addr(self, street_addr: str):
+        self._street_addr = street_addr
+
+    @latitude.setter
+    def latitude(self, latitude: float):
+        self._latitude = latitude
+
+    @longitude.setter
+    def longitude(self, longitude: float):
+        self._longitude = longitude
 
     @assignment_date.setter
     def assignment_date(self, assignment_date: str):

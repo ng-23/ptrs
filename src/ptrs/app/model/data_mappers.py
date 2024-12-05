@@ -251,8 +251,8 @@ class WorkOrderMapper(SQLiteDataMapper):
             sort_params = {}
         if query_params is None:
             query_params = {}
-        stmt = """SELECT work_order_id,pothole_id,assignment_date,expected_completion,size,location,other_info,
-        repair_priority,repair_type,estimated_man_hours,repair_status FROM WorkOrders"""
+        stmt = """SELECT work_order_id,pothole_id,street_addr,latitude,longitude,assignment_date,expected_completion,
+        size,location,other_info,repair_priority,repair_type,estimated_man_hours,repair_status FROM WorkOrders"""
 
         if len(query_params) > 0:
             stmt += " WHERE "
@@ -310,8 +310,8 @@ class WorkOrderMapper(SQLiteDataMapper):
         Insert a new Work Order into the database
         """
 
-        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,expected_completion,size,location,
-        other_info,repair_priority,repair_type,estimated_man_hours,repair_status) VALUES (?,?,?,?,?,?,?,?,?,?)"""
+        query = """INSERT INTO WorkOrders (pothole_id,street_addr,latitude,longitude,assignment_date,expected_completion,
+        size,location,other_info,repair_priority,repair_type,estimated_man_hours,repair_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"""
 
         work_order_id = super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
         work_order.work_order_id = work_order_id
