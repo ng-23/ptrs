@@ -25,9 +25,13 @@ def create_app():
             os.getenv("DATABASE_SCHEMA")
         )  # this creates the database according to the provided schema and saves it to the provided location
 
+    @app.route("/")
+    def index():
+        return render_template("index.html")
+
     @app.route("/about/")
     def about():
-        return "Pothole Tracking and Repair System (PTRS)"
+        return render_template("about.html")
 
     @app.route("/potholes/")
     def potholes():
