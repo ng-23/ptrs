@@ -116,7 +116,6 @@ async function initMap() {
 						pothole.size,
 						pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase()),
 						pothole.report_date,
-						pothole.expected_completion,
 					];
 
 					for (let i = 0; i < values.length; i++) {
