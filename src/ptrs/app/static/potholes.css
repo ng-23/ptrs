@@ -42,7 +42,7 @@ body {
 }
 
 .submitCard {
-	padding: 25px 50px 25px 50px;
+	padding: 25px 50px;
 	grid-column-start: 1;
 	grid-column-end: 2;
 	grid-row-start: 3;
@@ -50,7 +50,7 @@ body {
 }
 
 .mapHelpCard {
-	padding: 10px 40px 10px 40px;
+	padding: 10px 40px;
 	background-color: rgba(255, 255, 255, 0.75);
 	z-index: 1;
 	grid-column-start: 2;
@@ -60,7 +60,7 @@ body {
 }
 
 .viewCard {
-	padding: 25px 40px 25px 40px;
+	padding: 25px 40px;
 	grid-column-start: 2;
 	grid-column-end: 3;
 	grid-row-start: 3;
@@ -212,7 +212,7 @@ body {
 .formRow > input[type="submit"] {
 	margin-left: auto;
 	margin-top: auto;
-	padding: 5px 10px 5px 10px;
+	padding: 5px 10px;
 	background-color: #007aff;
 	border: none;
 	border-radius: 25px;
@@ -220,6 +220,7 @@ body {
 	font-size: 16px;
 	color: #ffffff;
 	cursor: pointer;
+	transition: 0.2s ease;
 }
 
 .formRow > input[type="submit"]:hover {

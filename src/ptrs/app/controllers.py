@@ -110,7 +110,7 @@ class ReadPotholes(Controller):
         return self._view.format_response()
 
 
-@register_routable_controller(f"{API_ROUTE_PREFIX}/potholes/", "PATCH")
+@register_routable_controller(f"{API_ROUTE_PREFIX}/pothole/", "PATCH")
 @register_controller("update_potholes", services.UpdatePotholes, views.UpdatePotholes)
 class UpdatePotholes(Controller):
     methods = ["PATCH"]

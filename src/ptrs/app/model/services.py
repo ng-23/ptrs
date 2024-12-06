@@ -73,7 +73,7 @@ class CreatePothole(Service):
         if request.is_json and request.content_length > 0:
             request.json.update({
                 "repair_status": "not repaired",
-                "repair_type":"unknown",
+                "repair_type": "concrete" if request.json["size"] >= 8 else "asphalt",
                 "repair_priority": ("major" if request.json["size"] >= 8 else "medium" if request.json["size"] >= 4 else "minor"),
                 "report_date": f"{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}",
                 "expected_completion": f"{(date.today() + timedelta(2)).strftime("%B %d, %Y")}",

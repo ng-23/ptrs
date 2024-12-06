@@ -199,9 +199,7 @@ class PotholeMapper(SQLiteDataMapper):
             args=args, 
             do_insert=False,
             )
-        
-        print(args[1])
-        print(self._build_read_statement(query_params=query_params))
+
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params), 
             args=(args[1],), # index 1 contains the query parameters (don't need the update fields for a select)
@@ -305,6 +303,8 @@ class WorkOrderMapper(SQLiteDataMapper):
         stmt += " WHERE "
         stmt += " AND ".join([f"{param}=?" for param in query_params]) # add the fields to filter by to the query
 
+        return stmt
+
     def create(self, work_order: entities.WorkOrder) -> entities.WorkOrder:
         """
         Insert a new Work Order into the database
@@ -358,23 +358,23 @@ class WorkOrderMapper(SQLiteDataMapper):
             )
     
     def update(self, query_params:dict, update_fields:dict):
+        """
+        Update 1 or more existing Work Orders in the database
+        """
+
         try:
             stmt = self._build_update_statement(query_params, update_fields)
         except Exception as e:
-            return utils.ModelState(
-                valid=False, 
-                message=e.args[0]["message"], 
-                data=e.args[0]["data"],
-                )
-        
-        args = tuple(list(update_fields.values()) + list(query_params.values()))
+            return utils.ModelState(valid=False, message=e.args[0]["message"], data=e.args[0]["data"], errors=[e])
+
+        args = tuple(list(update_fields.values()) + [query_params[param]["val"] for param in query_params])
 
         num_updated = super()._exec_dml_command(
-            stmt, 
-            args=args, 
+            stmt,
+            args=args,
             do_insert=False,
             )
-        
+
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params),
             args=(args[1],),
@@ -382,7 +382,7 @@ class WorkOrderMapper(SQLiteDataMapper):
             )
 
         return utils.ModelState(
-            valid=True, 
-            message=f"Successfully updated {num_updated} Work Orders", 
+            valid=True,
+            message=f"Successfully updated {num_updated} Work Orders",
             data=[entities.WorkOrder(**dict(record)) for record in updated_records],
             )

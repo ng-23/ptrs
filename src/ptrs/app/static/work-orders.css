@@ -1,0 +1,133 @@
+/* Standard HTML elements */
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    top: 0;
+}
+
+body {
+    background-color: #f5f5f5;
+    font-family: "Open Sans", serif;
+}
+
+h1 {
+    margin: 10px;
+    font-size: 18px;
+}
+
+p {
+    margin: 10px;
+    font-size: 16px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #9AA0A6;
+    border-radius: 5px;
+}
+
+/* Cards */
+
+.card {
+    width: 95%;
+    height: 95%;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+/* Buttons */
+
+.typeButtons {
+    width: 601px;
+    height: 100px;
+    margin: 0 auto;
+    padding: 25px 0 0 350px;
+    display: block;
+    align-content: center;
+}
+
+.typeButtons > button {
+    height: 50px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+    font-family: "Open Sans", serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.typeSelect {
+    width: 125px;
+    margin: 0 -1px;
+}
+
+.typeSelect:hover,
+.generateReportButton:hover {
+    background-color: #1e90ff !important;
+    color: #ffffff !important;
+}
+
+.activeButton{
+    background-color: #007aff;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    color: #ffffff;
+}
+
+.completeButton {
+    background-color: #ffffff;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    color: #000000;
+}
+
+.generateReportButton {
+    width: 175px;
+    float: right;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Grid */
+
+.gridContainer {
+    width: 1100px;
+    height: 850px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 550px 550px;
+    grid-auto-rows: 850px;
+}
+
+/* Map */
+
+.map {
+    width: 100%;
+    height: 40%;
+    display: block;
+}
+
+.displayInfo {
+    height: calc(60% - 50px);
+    padding: 25px 50px;
+    display: block;
+    line-height: 20px;
+}
