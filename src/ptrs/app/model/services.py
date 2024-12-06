@@ -161,6 +161,9 @@ class CreateWorkOrder(Service):
     def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
         if request.is_json and request.content_length > 0:
+            request.json.update({
+                "assignment_date": f"{date.today().strftime("%B %d, %Y")}",
+            })
             try:
                 work_order = entities.WorkOrder(**request.json)
             except Exception as e:

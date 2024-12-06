@@ -344,19 +344,16 @@ class WorkOrderMapper(SQLiteDataMapper):
             return_one=False,
             )
 
-        work_orders = [entities.WorkOrder(**dict(record)) for record in records]
-
         data = [dict(record) for record in records]
-
         for work_order in data:
-            stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,repair_type,
-            repair_priority,report_date,expected_completion FROM Potholes WHERE pothole_id=?"""
+            stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
+            repair_type,repair_priority,report_date,expected_completion FROM Potholes WHERE pothole_id=?"""
             record = super()._exec_dql_command(stmt, tuple(str(work_order["pothole_id"])), return_one=True)
             work_order["pothole"] = dict(record)
 
         return utils.ModelState(
             valid=True, 
-            message=f"Found {len(work_orders)} Work Orders matching query", 
+            message=f"Found {len(data)} Work Orders matching query",
             data=data,
             )
     

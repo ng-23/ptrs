@@ -53,19 +53,23 @@ async function initMap() {
                 size.innerHTML = "Size: " + workOrder.pothole.size + "/10";
 
                 let location = displayInfo.appendChild(document.createElement("p"));
-                location.innerHTML = "Location: " + workOrder.pothole.location.replace("_", " ").replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
+                location.innerHTML = "Location: " + workOrder.pothole.location.replace("_", " ")
+                    .replace(/(^\w)|(\s+\w)/g, (letter) => letter.toUpperCase());
 
                 let repairPriority = displayInfo.appendChild(document.createElement("p"));
-                repairPriority.innerHTML = "Repair Priority: " + workOrder.pothole.repair_priority.replace(/(^\w{1})/g, (letter) => letter.toUpperCase());
+                repairPriority.innerHTML = "Repair Priority: " + workOrder.pothole.repair_priority
+                    .replace(/(^\w)/g, (letter) => letter.toUpperCase());
 
                 let repairType = displayInfo.appendChild(document.createElement("p"));
-                repairType.innerHTML = "Repair Type: " + workOrder.pothole.repair_type.replace(/(^\w{1})/g, (letter) => letter.toUpperCase());
+                repairType.innerHTML = "Repair Type: " + workOrder.pothole.repair_type
+                    .replace(/(^\w)/g, (letter) => letter.toUpperCase());
 
                 let estManHours = displayInfo.appendChild(document.createElement("p"));
                 estManHours.innerHTML = "Estimated Man Hours: " + workOrder.estimated_man_hours;
 
                 let repairStatus = displayInfo.appendChild(document.createElement("p"));
-                repairStatus.innerHTML = "Repair Status: " + workOrder.pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
+                repairStatus.innerHTML = "Repair Status: " + workOrder.pothole.repair_status
+                    .replace(/(^\w)|(\s+\w)/g, (letter) => letter.toUpperCase());
 
                 let otherInfo = displayInfo.appendChild(document.createElement("p"));
                 otherInfo.innerHTML = "Other Information: " + workOrder.pothole.other_info;
@@ -85,7 +89,7 @@ async function initMap() {
                     borderColor: "#051094",
                     glyphColor: "#ffffff",
                 });
-                let previousReportMarker = new AdvancedMarkerElement({
+                new AdvancedMarkerElement({
                     map,
                     position: { lat: workOrder.pothole.latitude, lng: workOrder.pothole.longitude },
                     content: pinBlue.element,
