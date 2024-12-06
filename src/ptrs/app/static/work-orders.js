@@ -130,6 +130,7 @@ async function initMap() {
 
 let activeButton = document.querySelector(".activeButton");
 let completeButton = document.querySelector(".completeButton");
+let generateReportButton = document.querySelector(".generateReportButton");
 
 activeButton.addEventListener("click", function() {
     activeButton.style.backgroundColor = "#007aff";
@@ -164,5 +165,9 @@ completeButton.addEventListener("click", function() {
         }
     }
 });
+
+generateReportButton.addEventListener("click", function() {
+    window.open(window.location.href.replace("/work-orders/", "/api/report/"), '_blank');
+})
 
 window.initMap = initMap;

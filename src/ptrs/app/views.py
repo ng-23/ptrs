@@ -194,3 +194,29 @@ class UpdateWorkOrders(View):
 
     def notify(self, model_state: ModelState):
         self.model_state = model_state
+
+
+@register_view("read_work_orders", services.ReadWorkOrders)
+class ReadReport(View):
+    def __init__(self, service: services.ReadWorkOrders):
+        super().__init__()
+        self._service = service
+        self.model_state = None
+
+    def format_response(self, *args, **kwargs) -> tuple[dict, int]:
+        status = 200
+        if not self._model_state.valid:
+            status = 404
+
+        data = {"message": self._model_state.message, "data": []}
+
+        for item in self._model_state.data:
+            if isinstance(item, entities.Entity):
+                data["data"].append(item.to_json())
+            else:
+                data["data"].append(item)
+
+        return dict(data), status
+
+    def notify(self, model_state: ModelState):
+        self.model_state = model_state

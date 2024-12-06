@@ -1,8 +1,10 @@
 from ptrs.app import views, database
 from ptrs.app.model import services
-from flask import request, g
+from flask import request, g, render_template, make_response
 from flask.views import View
 from abc import ABC, abstractmethod
+from xhtml2pdf import pisa
+from io import BytesIO
 
 API_ROUTE_PREFIX = "/api" # prepend this to any route that is intended to act as a REST API endpoint
 
@@ -172,3 +174,31 @@ class UpdateWorkOrders(Controller):
         self._service.app_ctx = g
         self._service.change_state(request)
         return self._view.format_response()
+
+
+@register_routable_controller(f"{API_ROUTE_PREFIX}/report/", "GET")
+@register_controller("read_report", services.ReadWorkOrders, views.ReadReport)
+class ReadReport(Controller):
+    methods = ["GET"]
+
+    def __init__(self, service: services.ReadWorkOrders, view: views.ReadReport):
+        self._service = service
+        self._view = view
+
+    def dispatch_request(self):
+        database.get_db()
+        self._service.app_ctx = g
+        self._service.change_state(request)
+
+        data, status = self._view.format_response()
+
+        pdf = BytesIO()
+
+        report = render_template("report.html", work_orders=data["data"])
+        pisa.CreatePDF(report, pdf)
+
+        response = make_response(pdf.getvalue())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
+
+        return response
