@@ -51,7 +51,7 @@ class SQLiteDataMapper:
 
 
 class PotholeMapper(SQLiteDataMapper):
-    NON_UPDATABLE_FIELDS = {"pothole_id"}
+    NON_UPDATABLE_FIELDS = {"pothole_id", "street_addr", "latitude", "longitude",  "report_date"}
     
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
@@ -211,7 +211,7 @@ class PotholeMapper(SQLiteDataMapper):
 
 
 class WorkOrderMapper(SQLiteDataMapper):
-    NON_UPDATABLE_FIELDS = {"work_order_id", "pothole_id"}
+    NON_UPDATABLE_FIELDS = {"work_order_id", "pothole_id", "assignment_date"}
 
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
