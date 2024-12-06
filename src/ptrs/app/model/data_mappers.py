@@ -81,13 +81,14 @@ class PotholeMapper(SQLiteDataMapper):
 
         If no query parameters are provided, a statement to select all Potholes will be returned
         """
-
         if sort_params is None:
             sort_params = {}
         if query_params is None:
             query_params = {}
         stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
+
+        print(query_params)
 
         if len(query_params) > 0:
             stmt += " WHERE "
@@ -114,7 +115,6 @@ class PotholeMapper(SQLiteDataMapper):
         """
         Prepares an update statement form the given query parameters and fields to update
         """
-
         stmt = """UPDATE Potholes SET """
 
         if len(query_params) == 0:
@@ -147,7 +147,6 @@ class PotholeMapper(SQLiteDataMapper):
         """
         Insert a new Pothole into the database
         """
-
         query = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion) VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
 
@@ -162,7 +161,6 @@ class PotholeMapper(SQLiteDataMapper):
 
         If no query parameters are specified, all Potholes are selected.
         """
-
         if sort_params is None:
             sort_params = {}
         if query_params is None:
@@ -186,7 +184,6 @@ class PotholeMapper(SQLiteDataMapper):
         """
         Update 1 or more existing Potholes in the database
         """
-
         try:
             stmt = self._build_update_statement(query_params, update_fields)
         except Exception as e:
@@ -244,13 +241,11 @@ class WorkOrderMapper(SQLiteDataMapper):
 
         If no query parameters are provided, a statement to select all Work Orders will be returned
         """
-
         if sort_params is None:
             sort_params = {}
         if query_params is None:
             query_params = {}
-        stmt = """SELECT work_order_id,pothole_id,street_addr,latitude,longitude,assignment_date,expected_completion,
-        size,location,other_info,repair_priority,repair_type,estimated_man_hours,repair_status FROM WorkOrders"""
+        stmt = """SELECT work_order_id,pothole_id,assignment_date,estimated_man_hours FROM WorkOrders"""
 
         if len(query_params) > 0:
             stmt += " WHERE "
@@ -272,6 +267,9 @@ class WorkOrderMapper(SQLiteDataMapper):
         return stmt
     
     def _build_update_statement(self, query_params:dict, update_fields:dict):
+        """
+        Prepares an update statement form the given query parameters and fields to update
+        """
         stmt = """UPDATE WorkOrders SET """
 
         if len(query_params) == 0:
@@ -309,9 +307,7 @@ class WorkOrderMapper(SQLiteDataMapper):
         """
         Insert a new Work Order into the database
         """
-
-        query = """INSERT INTO WorkOrders (pothole_id,street_addr,latitude,longitude,assignment_date,expected_completion,
-        size,location,other_info,repair_priority,repair_type,estimated_man_hours,repair_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,estimated_man_hours) VALUES (?,?,?)"""
 
         work_order_id = super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
         work_order.work_order_id = work_order_id
@@ -328,7 +324,6 @@ class WorkOrderMapper(SQLiteDataMapper):
 
         If no query parameters are specified, all Work Orders will be selected
         """
-
         if sort_params is None:
             sort_params = {}
         if query_params is None:
@@ -351,17 +346,24 @@ class WorkOrderMapper(SQLiteDataMapper):
 
         work_orders = [entities.WorkOrder(**dict(record)) for record in records]
 
+        data = [dict(record) for record in records]
+
+        for work_order in data:
+            stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,repair_type,
+            repair_priority,report_date,expected_completion FROM Potholes WHERE pothole_id=?"""
+            record = super()._exec_dql_command(stmt, tuple(str(work_order["pothole_id"])), return_one=True)
+            work_order["pothole"] = dict(record)
+
         return utils.ModelState(
             valid=True, 
             message=f"Found {len(work_orders)} Work Orders matching query", 
-            data=work_orders,
+            data=data,
             )
     
     def update(self, query_params:dict, update_fields:dict):
         """
         Update 1 or more existing Work Orders in the database
         """
-
         try:
             stmt = self._build_update_statement(query_params, update_fields)
         except Exception as e:
@@ -373,13 +375,13 @@ class WorkOrderMapper(SQLiteDataMapper):
             stmt,
             args=args,
             do_insert=False,
-            )
+        )
 
         updated_records = super()._exec_dql_command(
             self._build_read_statement(query_params=query_params),
-            args=(args[1],),
+            args=(args[1],), # index 1 contains the query parameters (don't need the update fields for a select)
             return_one=False,
-            )
+        )
 
         return utils.ModelState(
             valid=True,

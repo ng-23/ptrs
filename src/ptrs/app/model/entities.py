@@ -181,39 +181,17 @@ class Pothole(Entity):
 
 
 class WorkOrder(Entity):
-    VALID_REPAIR_STATUSES = Pothole.VALID_REPAIR_STATUSES
-
     def __init__(
             self,
             pothole_id: int,
-            street_addr: str,
-            latitude: float,
-            longitude: float,
             assignment_date: str,
-            expected_completion: str,
-            size: int,
-            location: str,
-            other_info: str,
-            repair_priority: str,
-            repair_type: str,
             estimated_man_hours: int,
-            repair_status: str,
             work_order_id: int | None = None,
     ):
         self.work_order_id = work_order_id
         self.pothole_id = pothole_id
-        self.street_addr = street_addr
-        self.latitude = latitude
-        self.longitude = longitude
         self.assignment_date = assignment_date
-        self.expected_completion = expected_completion
-        self.size = size
-        self.location = location
-        self.other_info = other_info
-        self.repair_priority = repair_priority
-        self.repair_type = repair_type
         self.estimated_man_hours = estimated_man_hours
-        self.repair_status = repair_status
 
     @property
     def work_order_id(self):
@@ -224,52 +202,12 @@ class WorkOrder(Entity):
         return self._pothole_id
 
     @property
-    def street_addr(self):
-        return self._street_addr
-
-    @property
-    def latitude(self):
-        return self._latitude
-
-    @property
-    def longitude(self):
-        return self._longitude
-
-    @property
     def assignment_date(self):
         return self._assignment_date
 
     @property
-    def expected_completion(self):
-        return self._expected_completion
-
-    @property
-    def size(self):
-        return self._size
-
-    @property
-    def location(self):
-        return self._location
-
-    @property
-    def other_info(self):
-        return self._other_info
-
-    @property
-    def repair_priority(self):
-        return self._repair_priority
-
-    @property
-    def repair_type(self):
-        return self._repair_type
-
-    @property
     def estimated_man_hours(self):
         return self._estimated_man_hours
-
-    @property
-    def repair_status(self):
-        return self._repair_status
 
     @work_order_id.setter
     def work_order_id(self, work_order_id: int | None):
@@ -279,56 +217,13 @@ class WorkOrder(Entity):
     def pothole_id(self, pothole_id: int):
         self._pothole_id = pothole_id
 
-    @street_addr.setter
-    def street_addr(self, street_addr: str):
-        self._street_addr = street_addr
-
-    @latitude.setter
-    def latitude(self, latitude: float):
-        self._latitude = latitude
-
-    @longitude.setter
-    def longitude(self, longitude: float):
-        self._longitude = longitude
-
     @assignment_date.setter
     def assignment_date(self, assignment_date: str):
         self._assignment_date = assignment_date
 
-    @expected_completion.setter
-    def expected_completion(self, expected_completion: str):
-        self._expected_completion = expected_completion
-
-    @size.setter
-    def size(self, size: int):
-        self._size = size
-
-    @location.setter
-    def location(self, location: str):
-        self._location = location
-
-    @other_info.setter
-    def other_info(self, other_info: str):
-        self._other_info = other_info
-
-    @repair_priority.setter
-    def repair_priority(self, repair_priority: str):
-        self._repair_priority = repair_priority
-
-    @repair_type.setter
-    def repair_type(self, repair_type: str):
-        self._repair_type = repair_type
-
     @estimated_man_hours.setter
     def estimated_man_hours(self, estimated_man_hours: int):
         self._estimated_man_hours = estimated_man_hours
-
-    @repair_status.setter
-    def repair_status(self, repair_status: str):
-        repair_status = repair_status.lower()
-        if repair_status not in self.VALID_REPAIR_STATUSES:
-            raise ValueError(f"Repair Type must be one of {self.VALID_REPAIR_STATUSES}, got '{repair_status}' instead")
-        self._repair_status = repair_status
 
     def to_tuple(self, incl_id=False):
         attrs = super().to_tuple()

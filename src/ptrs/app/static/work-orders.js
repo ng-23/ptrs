@@ -18,7 +18,7 @@ async function initMap() {
 
             for (let workOrder of parsedData.data) {
                 let card = gridContainer.appendChild(document.createElement("div"));
-                if (workOrder.repair_status === "repaired" || workOrder.repair_status === "removed") {
+                if (workOrder.pothole.repair_status === "repaired" || workOrder.pothole.repair_status === "removed") {
                     card.classList.add(...["card", `workOrder${i}`, "complete"]);
                     card.style.display = "none";
                 }
@@ -41,37 +41,37 @@ async function initMap() {
                 displayInfo.appendChild(document.createElement("br"));
 
                 let address = displayInfo.appendChild(document.createElement("p"));
-                address.innerHTML = "Address: " + workOrder.street_addr;
+                address.innerHTML = "Address: " + workOrder.pothole.street_addr;
 
                 let assignmentDate = displayInfo.appendChild(document.createElement("p"));
                 assignmentDate.innerHTML = "Assignment Date: " + workOrder.assignment_date;
 
                 let expectedCompletion = displayInfo.appendChild(document.createElement("p"));
-                expectedCompletion.innerHTML = "Expected Completion Date: " + workOrder.expected_completion;
+                expectedCompletion.innerHTML = "Expected Completion Date: " + workOrder.pothole.expected_completion;
 
                 let size = displayInfo.appendChild(document.createElement("p"));
-                size.innerHTML = "Size: " + workOrder.size + "/10";
+                size.innerHTML = "Size: " + workOrder.pothole.size + "/10";
 
                 let location = displayInfo.appendChild(document.createElement("p"));
-                location.innerHTML = "Location: " + workOrder.location.replace("_", " ").replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
+                location.innerHTML = "Location: " + workOrder.pothole.location.replace("_", " ").replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
 
                 let repairPriority = displayInfo.appendChild(document.createElement("p"));
-                repairPriority.innerHTML = "Repair Priority: " + workOrder.repair_priority.replace(/(^\w{1})/g, (letter) => letter.toUpperCase());
+                repairPriority.innerHTML = "Repair Priority: " + workOrder.pothole.repair_priority.replace(/(^\w{1})/g, (letter) => letter.toUpperCase());
 
                 let repairType = displayInfo.appendChild(document.createElement("p"));
-                repairType.innerHTML = "Repair Type: " + workOrder.repair_type.replace(/(^\w{1})/g, (letter) => letter.toUpperCase());
+                repairType.innerHTML = "Repair Type: " + workOrder.pothole.repair_type.replace(/(^\w{1})/g, (letter) => letter.toUpperCase());
 
                 let estManHours = displayInfo.appendChild(document.createElement("p"));
                 estManHours.innerHTML = "Estimated Man Hours: " + workOrder.estimated_man_hours;
 
                 let repairStatus = displayInfo.appendChild(document.createElement("p"));
-                repairStatus.innerHTML = "Repair Status: " + workOrder.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
+                repairStatus.innerHTML = "Repair Status: " + workOrder.pothole.repair_status.replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
 
                 let otherInfo = displayInfo.appendChild(document.createElement("p"));
-                otherInfo.innerHTML = "Other Information: " + workOrder.other_info;
+                otherInfo.innerHTML = "Other Information: " + workOrder.pothole.other_info;
 
                 let map = new Map(document.querySelector(`.map${i}`), {
-                    center: { lat: workOrder.latitude, lng: workOrder.longitude },
+                    center: { lat: workOrder.pothole.latitude, lng: workOrder.pothole.longitude },
                     zoom: 16,
                     mapId: "c894f5bb0ee453ef",
                     disableDefaultUI: true,
@@ -87,7 +87,7 @@ async function initMap() {
                 });
                 let previousReportMarker = new AdvancedMarkerElement({
                     map,
-                    position: { lat: workOrder.latitude, lng: workOrder.longitude },
+                    position: { lat: workOrder.pothole.latitude, lng: workOrder.pothole.longitude },
                     content: pinBlue.element,
                 });
 

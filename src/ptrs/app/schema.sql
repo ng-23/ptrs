@@ -19,17 +19,7 @@ CREATE TABLE Potholes (
 CREATE TABLE WorkOrders (
     work_order_id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
     pothole_id INTEGER NOT NULL UNIQUE,
-    street_addr TEXT NOT NULL,
-    latitude FLOAT NOT NULL,
-    longitude FLOAT NOT NULL,
     assignment_date TEXT NOT NULL,
-    expected_completion TEXT NOT NULL,
-    size INTEGER NOT NULL,
-    location TEXT NOT NULL,
-    other_info TEXT,
-    repair_priority TEXT NOT NULL,
-    repair_type TEXT NOT NULL,
     estimated_man_hours INTEGER NOT NULL,
-    repair_status TEXT NOT NULL,
     FOREIGN KEY (pothole_id) REFERENCES Potholes (pothole_id)
 );

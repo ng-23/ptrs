@@ -1,8 +1,11 @@
 import os
-from ptrs.app import controllers, database
-from ptrs.app.model import services
+from ptrs.app import database
 from flask import Flask, render_template
 from dotenv import load_dotenv
+
+# NEEDED FOR THOSE NOT USING PIXI
+from ptrs.app import controllers
+from ptrs.app.model import services
 
 """
 When you import the ptrs.app package,
@@ -17,8 +20,7 @@ API_SORT_OPERATORS = {"+":'ASC',"-":'DESC'} # if present in the part of the quer
 # load environment variables, which we'll use to configure the app
 load_dotenv()
 
-
-def add_routable_controllers(app: Flask):
+def add_routable_controllers(app: Flask): # NEEDED FOR THOSE NOT USING PIXI
     """
     A routable Controller is a Controller with an API route assigned to it
     These Controllers are intended to be interacted with by the user via HTTP request methods
@@ -45,7 +47,7 @@ def add_routable_controllers(app: Flask):
 def create_app():
     app = Flask(__name__)
     app.config["DATABASE"] = os.getenv("DATABASE")
-    add_routable_controllers(app)
+    add_routable_controllers(app) # NEEDED FOR THOSE NOT USING PIXI
 
     with app.app_context():
         database.init_db(
