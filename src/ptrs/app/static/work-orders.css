@@ -18,6 +18,7 @@ h1 {
 }
 
 p {
+    height: 20px;
     margin: 10px;
     font-size: 16px;
 }
@@ -53,7 +54,7 @@ p {
 
 /* Buttons */
 
-.typeButtons {
+.buttonsDiv {
     width: 601px;
     height: 100px;
     margin: 0 auto;
@@ -62,7 +63,7 @@ p {
     align-content: center;
 }
 
-.typeButtons > button {
+button {
     height: 50px;
     padding: 5px 10px;
     border: none;
@@ -125,9 +126,25 @@ p {
     display: block;
 }
 
+/* Work Order Display */
+
 .displayInfo {
     height: calc(60% - 50px);
     padding: 25px 50px;
     display: block;
     line-height: 20px;
+}
+
+.updateButton {
+    width: 100px;
+    height: 40px;
+    float: right;
+    background-color: #007aff;
+    box-shadow: none;
+    color: #ffffff;
+}
+
+.updateButton:hover {
+    background-color: #1e90ff;
+    color: #ffffff;
 }

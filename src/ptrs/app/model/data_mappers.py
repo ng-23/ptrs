@@ -1,6 +1,7 @@
 import sqlite3
 from ptrs.app import utils, exceptions
 from ptrs.app.model import entities
+from datetime import date
 
 
 class SQLiteDataMapper:
@@ -152,6 +153,17 @@ class PotholeMapper(SQLiteDataMapper):
 
         pothole_id = super()._exec_dml_command(query, args=pothole.to_tuple(incl_id=False), do_insert=True)
         pothole.pothole_id = pothole_id
+
+        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,estimated_man_hours) VALUES (?,?,?)"""
+
+        # TODO Probably a better way to do this
+        record = {
+            "pothole_id": pothole_id,
+            "assignment_date": f"{date.today().strftime("%B %d, %Y")}",
+            "estimated_man_hours": 1 if pothole.size < 3 else 3 if pothole.size < 7 else 5
+        }
+        work_order = entities.WorkOrder(**dict(record))
+        super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
 
         return utils.ModelState(valid=True, message=f"Successfully created new Pothole with id {pothole_id}", data=[pothole])
 
@@ -344,12 +356,13 @@ class WorkOrderMapper(SQLiteDataMapper):
             return_one=False,
             )
 
+        # TODO Probably a better way to do this
         data = [dict(record) for record in records]
         for work_order in data:
             stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
             repair_type,repair_priority,report_date,expected_completion FROM Potholes WHERE pothole_id=?"""
             record = super()._exec_dql_command(stmt, tuple(str(work_order["pothole_id"])), return_one=True)
-            work_order["pothole"] = dict(record)
+            work_order.update({"pothole": dict(record)})
 
         return utils.ModelState(
             valid=True, 

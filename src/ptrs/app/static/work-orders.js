@@ -17,6 +17,7 @@ async function initMap() {
             let i = 1;
 
             for (let workOrder of parsedData.data) {
+                // Create information elements for each work order
                 let card = gridContainer.appendChild(document.createElement("div"));
                 if (workOrder.pothole.repair_status === "repaired" || workOrder.pothole.repair_status === "removed") {
                     card.classList.add(...["card", `workOrder${i}`, "complete"]);
@@ -73,7 +74,31 @@ async function initMap() {
 
                 let otherInfo = displayInfo.appendChild(document.createElement("p"));
                 otherInfo.innerHTML = "Other Information: " + workOrder.pothole.other_info;
+                otherInfo.style.overflow = "hidden";
 
+                let updateButton = displayInfo.appendChild(document.createElement("button"));
+                updateButton.innerHTML = "Update";
+                updateButton.classList.add("updateButton");
+
+                updateButton.addEventListener("click", () => {
+                    fetch(`/api/pothole?pothole_id=${workOrder.pothole_id}`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            "repair_status": "repaired"
+                        }),
+                    })
+                        .then((response) => response.text())
+                        .catch((error) => {
+                            console.error("Error:", error);
+                        });
+
+                    window.location.reload();
+                })
+
+                // Create map element for each work order
                 let map = new Map(document.querySelector(`.map${i}`), {
                     center: { lat: workOrder.pothole.latitude, lng: workOrder.pothole.longitude },
                     zoom: 16,
