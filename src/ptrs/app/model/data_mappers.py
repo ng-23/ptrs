@@ -89,8 +89,6 @@ class PotholeMapper(SQLiteDataMapper):
         stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion FROM Potholes"""
 
-        print(query_params)
-
         if len(query_params) > 0:
             stmt += " WHERE "
 
