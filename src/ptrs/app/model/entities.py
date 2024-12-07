@@ -46,7 +46,8 @@ class Pothole(Entity):
             repair_priority: str,
             report_date: str,
             expected_completion: str,
-            other_info: str = "",
+            actual_completion: str | None = None,
+            other_info: str | None = None,
             pothole_id: int | None = None,
     ):
         self.pothole_id = pothole_id
@@ -61,6 +62,7 @@ class Pothole(Entity):
         self.repair_priority = repair_priority
         self.report_date = report_date
         self.expected_completion = expected_completion
+        self.actual_completion = actual_completion
 
     @property
     def pothole_id(self):
@@ -110,6 +112,10 @@ class Pothole(Entity):
     def expected_completion(self):
         return self._expected_completion
 
+    @property
+    def actual_completion(self):
+        return self._actual_completion
+
     @pothole_id.setter
     def pothole_id(self, pothole_id: int | None):
         self._pothole_id = pothole_id
@@ -140,7 +146,7 @@ class Pothole(Entity):
         self._location = location
 
     @other_info.setter
-    def other_info(self, other_info: str):
+    def other_info(self, other_info: str | None):
         self._other_info = other_info
 
     @repair_status.setter
@@ -172,6 +178,10 @@ class Pothole(Entity):
     def expected_completion(self, expected_completion: str):
         self._expected_completion = expected_completion
 
+    @actual_completion.setter
+    def actual_completion(self, actual_completion: str | None):
+        self._actual_completion = actual_completion
+
     def to_tuple(self, incl_id=False):
         attrs = super().to_tuple()
         if incl_id:
@@ -186,12 +196,14 @@ class WorkOrder(Entity):
             pothole_id: int,
             assignment_date: str,
             estimated_man_hours: int,
+            actual_man_hours: int | None = None,
             work_order_id: int | None = None,
     ):
         self.work_order_id = work_order_id
         self.pothole_id = pothole_id
         self.assignment_date = assignment_date
         self.estimated_man_hours = estimated_man_hours
+        self.actual_man_hours = actual_man_hours
 
     @property
     def work_order_id(self):
@@ -209,6 +221,10 @@ class WorkOrder(Entity):
     def estimated_man_hours(self):
         return self._estimated_man_hours
 
+    @property
+    def actual_man_hours(self):
+        return self._actual_man_hours
+
     @work_order_id.setter
     def work_order_id(self, work_order_id: int | None):
         self._work_order_id = work_order_id
@@ -224,6 +240,10 @@ class WorkOrder(Entity):
     @estimated_man_hours.setter
     def estimated_man_hours(self, estimated_man_hours: int):
         self._estimated_man_hours = estimated_man_hours
+
+    @actual_man_hours.setter
+    def actual_man_hours(self, actual_man_hours: int | None):
+        self._actual_man_hours = actual_man_hours
 
     def to_tuple(self, incl_id=False):
         attrs = super().to_tuple()

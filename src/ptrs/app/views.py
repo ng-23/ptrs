@@ -1,7 +1,10 @@
+import datetime
 from ptrs.app.utils import Observer, ModelState
 from ptrs.app.model import services, entities
-from flask import Response, jsonify
+from flask import Response, jsonify, render_template, make_response
 from abc import abstractmethod
+from xhtml2pdf import pisa
+from io import BytesIO
 
 registered_views = {}  # maps a View class to a dict of {"name":str, "service":Service}
 
@@ -203,7 +206,7 @@ class ReadReport(View):
         self._service = service
         self.model_state = None
 
-    def format_response(self, *args, **kwargs) -> tuple[dict, int]:
+    def format_response(self, *args, **kwargs) -> tuple[Response, int]:
         status = 200
         if not self._model_state.valid:
             status = 404
@@ -216,7 +219,23 @@ class ReadReport(View):
             else:
                 data["data"].append(item)
 
-        return dict(data), status
+        pdf = BytesIO()
+        report = render_template(
+            "report.html",
+            work_orders=data["data"],
+            assigned_work_orders=len(data["data"]),
+            complete_work_orders=sum(work_order["pothole"]["repair_status"] in ["repaired", "removed", "temporarily repaired"] for work_order in data["data"]),
+            incomplete_work_orders=sum(work_order["pothole"]["repair_status"] == "not repaired" for work_order in data["data"]),
+            report_start_date=(datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday() + 1)).strftime("%B %d, %Y"),
+            report_end_date=(datetime.date.today() + datetime.timedelta(days=5 - datetime.date.today().weekday())).strftime("%B %d, %Y")
+        )
+        pisa.CreatePDF(report, pdf)
+
+        response = make_response(pdf.getvalue())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
+
+        return response, status
 
     def notify(self, model_state: ModelState):
         self.model_state = model_state

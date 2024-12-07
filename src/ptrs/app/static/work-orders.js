@@ -19,7 +19,7 @@ async function initMap() {
             for (let workOrder of parsedData.data) {
                 // Create information elements for each work order
                 let card = gridContainer.appendChild(document.createElement("div"));
-                if (workOrder.pothole.repair_status === "repaired" || workOrder.pothole.repair_status === "removed") {
+                if (["repaired", "removed", "temporarily repaired"].includes(workOrder.pothole.repair_status)) {
                     card.classList.add(...["card", `workOrder${i}`, "complete"]);
                     card.style.display = "none";
                 }
