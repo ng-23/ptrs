@@ -12,15 +12,15 @@ CREATE TABLE Potholes (
     repair_status TEXT NOT NULL,
     repair_type TEXT NOT NULL,
     repair_priority TEXT NOT NULL,
-    report_date TEXT NOT NULL,
-    expected_completion TEXT NOT NULL,
-    actual_completion TEXT
+    report_date DATETIME NOT NULL,
+    expected_completion DATETIME NOT NULL,
+    actual_completion DATETIME
 );
 
 CREATE TABLE WorkOrders (
     work_order_id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
     pothole_id INTEGER NOT NULL UNIQUE,
-    assignment_date TEXT NOT NULL,
+    assignment_date DATETIME NOT NULL,
     estimated_man_hours INTEGER NOT NULL,
     actual_man_hours INTEGER,
     FOREIGN KEY (pothole_id) REFERENCES Potholes (pothole_id)

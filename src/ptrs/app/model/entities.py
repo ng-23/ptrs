@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class Entity:
     @classmethod  # see https://stackoverflow.com/questions/12179271/meaning-of-classmethod-and-staticmethod-for-beginner
     def has_property(cls, property_name: str) -> bool:
@@ -44,9 +47,9 @@ class Pothole(Entity):
             repair_status: str,
             repair_type: str,
             repair_priority: str,
-            report_date: str,
-            expected_completion: str,
-            actual_completion: str | None = None,
+            report_date: datetime,
+            expected_completion: datetime,
+            actual_completion: datetime | None = None,
             other_info: str | None = None,
             pothole_id: int | None = None,
     ):
@@ -171,15 +174,15 @@ class Pothole(Entity):
         self._repair_priority = repair_priority
 
     @report_date.setter
-    def report_date(self, report_date: str):
+    def report_date(self, report_date: datetime):
         self._report_date = report_date
 
     @expected_completion.setter
-    def expected_completion(self, expected_completion: str):
+    def expected_completion(self, expected_completion: datetime):
         self._expected_completion = expected_completion
 
     @actual_completion.setter
-    def actual_completion(self, actual_completion: str | None):
+    def actual_completion(self, actual_completion: datetime | None):
         self._actual_completion = actual_completion
 
     def to_tuple(self, incl_id=False):
@@ -194,7 +197,7 @@ class WorkOrder(Entity):
     def __init__(
             self,
             pothole_id: int,
-            assignment_date: str,
+            assignment_date: datetime,
             estimated_man_hours: int,
             actual_man_hours: int | None = None,
             work_order_id: int | None = None,
@@ -234,7 +237,7 @@ class WorkOrder(Entity):
         self._pothole_id = pothole_id
 
     @assignment_date.setter
-    def assignment_date(self, assignment_date: str):
+    def assignment_date(self, assignment_date: datetime):
         self._assignment_date = assignment_date
 
     @estimated_man_hours.setter

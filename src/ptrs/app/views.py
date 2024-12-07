@@ -1,10 +1,10 @@
-import datetime
 from ptrs.app.utils import Observer, ModelState
 from ptrs.app.model import services, entities
 from flask import Response, jsonify, render_template, make_response
 from abc import abstractmethod
 from xhtml2pdf import pisa
 from io import BytesIO
+from datetime import date, timedelta
 
 registered_views = {}  # maps a View class to a dict of {"name":str, "service":Service}
 
@@ -199,14 +199,14 @@ class UpdateWorkOrders(View):
         self.model_state = model_state
 
 
-@register_view("read_work_orders", services.ReadWorkOrders)
+@register_view("read_work_orders", services.ReadReport)
 class ReadReport(View):
-    def __init__(self, service: services.ReadWorkOrders):
+    def __init__(self, service: services.ReadReport):
         super().__init__()
         self._service = service
         self.model_state = None
 
-    def format_response(self, *args, **kwargs) -> tuple[Response, int]:
+    def format_response(self, *args, **kwargs) -> Response:
         status = 200
         if not self._model_state.valid:
             status = 404
@@ -219,23 +219,34 @@ class ReadReport(View):
             else:
                 data["data"].append(item)
 
+        # TODO Fix python converts these dates to strings
+        for work_order in data["data"]:
+            work_order["pothole"]["report_date"] = work_order["pothole"]["report_date"][:19]
+            work_order["assignment_date"] = work_order["assignment_date"][:10]
+            work_order["pothole"]["expected_completion"] = work_order["pothole"]["expected_completion"][:10]
+            if work_order["pothole"]["actual_completion"] is not None:
+                work_order["pothole"]["actual_completion"] = work_order["pothole"]["actual_completion"][:10]
+
+        # TODO Might belong in services
         pdf = BytesIO()
         report = render_template(
             "report.html",
             work_orders=data["data"],
             assigned_work_orders=len(data["data"]),
+            on_time_work_orders=sum(work_order["pothole"]["expected_completion"] > work_order["pothole"]["actual_completion"] for work_order in data["data"] if
+                                    work_order["pothole"]["actual_completion"] is not None),
             complete_work_orders=sum(work_order["pothole"]["repair_status"] in ["repaired", "removed", "temporarily repaired"] for work_order in data["data"]),
             incomplete_work_orders=sum(work_order["pothole"]["repair_status"] == "not repaired" for work_order in data["data"]),
-            report_start_date=(datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday() + 1)).strftime("%B %d, %Y"),
-            report_end_date=(datetime.date.today() + datetime.timedelta(days=5 - datetime.date.today().weekday())).strftime("%B %d, %Y")
+            report_start_date=(date.today() - timedelta(days=date.today().weekday() + 1)).strftime("%B %d, %Y"),
+            report_end_date=(date.today() + timedelta(days=5 - date.today().weekday())).strftime("%B %d, %Y")
         )
         pisa.CreatePDF(report, pdf)
 
-        response = make_response(pdf.getvalue())
+        response = make_response(pdf.getvalue(), status)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
 
-        return response, status
+        return response
 
     def notify(self, model_state: ModelState):
         self.model_state = model_state

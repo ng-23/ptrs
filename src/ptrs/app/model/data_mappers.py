@@ -1,7 +1,7 @@
 import sqlite3
 from ptrs.app import utils, exceptions
 from ptrs.app.model import entities
-from datetime import date
+from datetime import datetime
 
 
 class SQLiteDataMapper:
@@ -157,7 +157,7 @@ class PotholeMapper(SQLiteDataMapper):
         # TODO Probably a better way to do this
         record = {
             "pothole_id": pothole_id,
-            "assignment_date": f"{date.today().strftime("%B %d, %Y")}",
+            "assignment_date": datetime.now(),
             "estimated_man_hours": 1 if pothole.size < 3 else 3 if pothole.size < 7 else 5
         }
         work_order = entities.WorkOrder(**dict(record))
@@ -196,7 +196,7 @@ class PotholeMapper(SQLiteDataMapper):
         """
         try:
             if "repair_status" in update_fields.keys() and update_fields["repair_status"] in ["repaired", "removed", "temporarily repaired"]:
-                update_fields.update({"actual_completion": f"{date.today().strftime("%B %d, %Y")}"})
+                update_fields.update({"actual_completion": datetime.now()})
             stmt = self._build_update_statement(query_params, update_fields)
         except Exception as e:
             return utils.ModelState(valid=False, message=e.args[0]["message"], data=e.args[0]["data"], errors=[e])
@@ -204,7 +204,7 @@ class PotholeMapper(SQLiteDataMapper):
         args = tuple(list(update_fields.values()) + [query_params[param]["val"] for param in query_params])
 
         num_updated = super()._exec_dml_command(
-            stmt, 
+            stmt,
             args=args, 
             do_insert=False,
             )
@@ -398,3 +398,102 @@ class WorkOrderMapper(SQLiteDataMapper):
             message=f"Successfully updated {num_updated} Work Orders",
             data=[entities.WorkOrder(**dict(record)) for record in updated_records],
             )
+
+class ReportMapper(SQLiteDataMapper):
+
+    def __init__(self, enable_foreign_keys=False):
+        super().__init__(enable_foreign_keys=enable_foreign_keys)
+
+    @staticmethod
+    def _check_pothole_field(field:str) -> str | None:
+        if entities.Pothole.has_property(field):
+            return field
+
+        return None
+
+    @staticmethod
+    def _check_invalid_field(field:str) -> str | None:
+        if not (entities.WorkOrder.has_property(field) or entities.Pothole.has_property(field)):
+            return field
+
+        return None
+
+    def _build_read_statement(self, query_params=None, sort_params=None):
+        """
+        Prepares a read statement from the given query and sort parameters
+
+        If no query parameters are provided, a statement to select all Work Orders will be returned
+        """
+        if sort_params is None:
+            sort_params = {}
+        if query_params is None:
+            query_params = {}
+        stmt = """SELECT work_order_id,pothole_id,assignment_date,estimated_man_hours,actual_man_hours FROM WorkOrders"""
+
+        if len(query_params) > 0:
+            stmt += " WHERE "
+
+            invalid_param = self._check_invalid_field(list(query_params.keys())[0])
+            if invalid_param is not None:
+                raise exceptions.InvalidQueryParams({"message":f"{len(invalid_param)} is not a queryable field of Work Orders", "data":invalid_param})
+            stmt += " AND ".join([f"{param}=?" for param in query_params])
+
+        pothole_field = self._check_pothole_field(list(sort_params.keys())[0])
+        order = None
+        if pothole_field is not None:
+            order = sort_params[pothole_field]
+            sort_params.pop(pothole_field)
+
+        if len(sort_params) > 0:
+            stmt += " ORDER BY "
+
+            invalid_param = self._check_invalid_field(list(sort_params.keys())[0])
+            if invalid_param is not None:
+                raise exceptions.InvalidSortParams({"message":f"{len(invalid_param)} is not a sortable field of Work Orders", "data":invalid_param})
+
+            stmt += ", ".join([f"{param} {sort_params[param]}" for param in sort_params])
+
+        return stmt, pothole_field, order
+
+    def read(self, query_params=None, sort_params=None):
+        """
+        Select 1 or more existing Work Orders from the database
+
+        If no query parameters are specified, all Work Orders will be selected
+        """
+        if sort_params is None:
+            sort_params = {}
+        if query_params is None:
+            query_params = {}
+
+        try:
+            stmt, pothole_field, order = self._build_read_statement(query_params=query_params, sort_params=sort_params)
+        except Exception as e:
+            return utils.ModelState(
+                valid=False,
+                message=e.args[0]["message"],
+                data=e.args[0]["data"],
+                errors=e,
+            )
+
+        records = super()._exec_dql_command(
+            stmt,
+            args=tuple(query_params[param]["val"] for param in query_params),
+            return_one=False,
+        )
+
+        # TODO Probably a better way to do this
+        data = [dict(record) for record in records]
+        for work_order in data:
+            stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
+            repair_type,repair_priority,report_date,expected_completion,actual_completion FROM Potholes WHERE pothole_id=?"""
+            record = super()._exec_dql_command(stmt, tuple(str(work_order["pothole_id"])), return_one=True)
+            work_order.update({"pothole": dict(record)})
+        if pothole_field is not None:
+            data = sorted(data, key=lambda x: x["pothole"][pothole_field], reverse=True if order == "DESC" else False)
+
+        return utils.ModelState(
+            valid=True,
+            message=f"Found {len(data)} Work Orders matching query",
+            data=data,
+        )

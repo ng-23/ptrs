@@ -131,6 +131,8 @@ async function initMap() {
 let activeButton = document.querySelector(".activeButton");
 let completeButton = document.querySelector(".completeButton");
 let generateReportButton = document.querySelector(".generateReportButton");
+let cancelGenerateReportButton = document.querySelector(".popup > .cancel");
+let generateReportSubmitButton = document.querySelector(".popup > input[type=submit]");
 
 activeButton.addEventListener("click", function() {
     activeButton.style.backgroundColor = "#007aff";
@@ -140,12 +142,7 @@ activeButton.addEventListener("click", function() {
 
     let cards = document.querySelectorAll(".card");
     for (let card of cards) {
-        if (card.classList.contains("active")) {
-            card.style.display = "block";
-        }
-        else {
-            card.style.display = "none";
-        }
+        card.style.display = (card.classList.contains("active")) ? "block" : "none";
     }
 });
 
@@ -157,17 +154,33 @@ completeButton.addEventListener("click", function() {
 
     let cards = document.querySelectorAll(".card");
     for (let card of cards) {
-        if (card.classList.contains("complete")) {
-            card.style.display = "block";
-        }
-        else {
-            card.style.display = "none";
-        }
+        card.style.display = (card.classList.contains("complete")) ? "block" : "none";
     }
 });
 
 generateReportButton.addEventListener("click", function() {
-    window.open(window.location.href.replace("/work-orders/", "/api/report/"), '_blank');
+    document.querySelectorAll("body :not(.popup, .popup > label, .popup > select, .popup > .cancel, .popup > input[type=submit])")
+        .forEach(element => element.style.filter = "blur(2px)");
+    document.querySelector(".popup").style.visibility = "visible";
+    document.querySelector(".popup").style.opacity = "1";
+})
+
+cancelGenerateReportButton.addEventListener("click", function() {
+    document.querySelectorAll("*").forEach(element => element.style.filter = "none");
+    document.querySelector(".popup").style.visibility = "hidden";
+    document.querySelector(".popup").style.opacity = "0";
+})
+
+generateReportSubmitButton.addEventListener("click", function() {
+    document.querySelectorAll("*").forEach(element => element.style.filter = "none");
+    document.querySelector(".popup").style.visibility = "hidden";
+    document.querySelector(".popup").style.opacity = "0";
+
+    let sortBy = document.querySelector("#sortBy").value;
+    let order = document.querySelector("#order").value;
+    let filter = (order === "ascending") ? "?sort_by=%2b" + sortBy : "?sort_by=%2d" + sortBy;
+
+    window.open(window.location.href.replace("/work-orders/", `/api/report/${filter}`), "_blank");
 })
 
 window.initMap = initMap;

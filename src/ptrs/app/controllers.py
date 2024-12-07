@@ -1,5 +1,5 @@
 from ptrs.app import views, database
-from ptrs.app.model import services
+from ptrs.app.model import services, entities
 from flask import request, g
 from flask.views import View
 from abc import ABC, abstractmethod
@@ -175,11 +175,11 @@ class UpdateWorkOrders(Controller):
 
 
 @register_routable_controller(f"{API_ROUTE_PREFIX}/report/", "GET")
-@register_controller("read_report", services.ReadWorkOrders, views.ReadReport)
+@register_controller("read_report", services.ReadReport, views.ReadReport)
 class ReadReport(Controller):
     methods = ["GET"]
 
-    def __init__(self, service: services.ReadWorkOrders, view: views.ReadReport):
+    def __init__(self, service: services.ReadReport, view: views.ReadReport):
         self._service = service
         self._view = view
 

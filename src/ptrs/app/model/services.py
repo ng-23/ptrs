@@ -2,7 +2,7 @@ from ptrs.app import utils
 from ptrs.app.model import data_mappers, entities
 from flask import Request, ctx
 from abc import abstractmethod
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 
 # maps a Service class to a dict of {"name":str, "data_mappers":[DataMapper]}
 registered_services = {}
@@ -75,8 +75,8 @@ class CreatePothole(Service):
                 "repair_status": "not repaired",
                 "repair_type": "concrete" if request.json["size"] >= 8 else "asphalt",
                 "repair_priority": ("major" if request.json["size"] >= 8 else "medium" if request.json["size"] >= 4 else "minor"),
-                "report_date": f"{datetime.now().strftime("%I:%M%p ") + date.today().strftime("%B %d, %Y")}",
-                "expected_completion": f"{(date.today() + timedelta(2)).strftime("%B %d, %Y")}",
+                "report_date": datetime.now(),
+                "expected_completion": datetime.now() + timedelta(2),
             })
             try:
                 pothole = entities.Pothole(**request.json)
@@ -162,7 +162,7 @@ class CreateWorkOrder(Service):
         self._work_order_mapper.db = self._app_ctx.db
         if request.is_json and request.content_length > 0:
             request.json.update({
-                "assignment_date": f"{date.today().strftime("%B %d, %Y")}",
+                "assignment_date": datetime.now(),
             })
             try:
                 work_order = entities.WorkOrder(**request.json)
@@ -229,4 +229,28 @@ class UpdateWorkOrders(Service):
                 self.notify_observers(self._work_order_mapper.update(query_params, request.json), *args, **kwargs)
         else:
             self.notify_observers(utils.ModelState(valid=False, message=f"Request body must be of mimetype application/json, got {request.mimetype} instead"))
+
+
+@register_service("read_report", data_mappers.ReportMapper)
+class ReadReport(Service):
+    def __init__(self, report_mapper: data_mappers.ReportMapper):
+        super().__init__()
+        self._report_mapper = report_mapper
+        self._observers = []
+
+    def register_observer(self, observer: utils.Observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, model_state: utils.ModelState, *args, **kwargs):
+        for observer in self._observers:
+            observer.notify(model_state, *args, **kwargs)
+
+    def change_state(self, request: Request, *args, **kwargs):
+        self._report_mapper.db = self._app_ctx.db
+        try:
+            query_params, sort_params = utils.distill_query_params(request)
+        except Exception as e:
+            self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
+        else:
+            self.notify_observers(self._report_mapper.read(query_params=query_params, sort_params=sort_params))
 
