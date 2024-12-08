@@ -54,11 +54,12 @@ class Service(utils.Observable):
         pass
 
 
-@register_service("create_pothole", data_mappers.PotholeMapper)
+@register_service("create_pothole", data_mappers.PotholeMapper, data_mappers.WorkOrderMapper)
 class CreatePothole(Service):
-    def __init__(self, pothole_mapper: data_mappers.PotholeMapper):
+    def __init__(self, pothole_mapper: data_mappers.PotholeMapper, work_order_mapper: data_mappers.WorkOrderMapper):
         super().__init__()
         self._pothole_mapper = pothole_mapper
+        self._work_order_mapper = work_order_mapper
         self._observers = []
 
     def register_observer(self, observer: utils.Observer):
@@ -70,6 +71,8 @@ class CreatePothole(Service):
 
     def change_state(self, request: Request, *args, **kwargs):
         self._pothole_mapper.db = self._app_ctx.db
+        self._work_order_mapper.db = self._app_ctx.db
+
         if request.is_json and request.content_length > 0:
             request.json.update({
                 "repair_status": "not repaired",
@@ -83,7 +86,14 @@ class CreatePothole(Service):
             except Exception as e:
                 self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
             else:
-                self.notify_observers(self._pothole_mapper.create(pothole), *args, **kwargs)
+                self.notify_observers(self._pothole_mapper.create(pothole), *args, **kwargs) # notify observers of successful pothole creation
+                # silently create a new work order
+                # TODO: in theory, this shouldn't fail...right?
+                self._work_order_mapper.create(entities.WorkOrder(
+                    pothole_id=pothole.pothole_id,
+                    assignment_date=datetime.now(),
+                    estimated_man_hours=1 if pothole.size < 3 else 3 if pothole.size < 7 else 5,
+                ))
         else:
             self.notify_observers(
                 utils.ModelState(
@@ -180,11 +190,12 @@ class CreateWorkOrder(Service):
             )
 
 
-@register_service("read_work_orders", data_mappers.WorkOrderMapper)
+@register_service("read_work_orders", data_mappers.WorkOrderMapper, data_mappers.PotholeMapper)
 class ReadWorkOrders(Service):
-    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper):
+    def __init__(self, work_order_mapper: data_mappers.WorkOrderMapper, pothole_mapper: data_mappers.PotholeMapper):
         super().__init__()
         self._work_order_mapper = work_order_mapper
+        self._pothole_mapper = pothole_mapper
         self._observers = []
 
     def register_observer(self, observer: utils.Observer):
@@ -196,12 +207,34 @@ class ReadWorkOrders(Service):
 
     def change_state(self, request: Request, *args, **kwargs):
         self._work_order_mapper.db = self._app_ctx.db
+        self._pothole_mapper.db = self._app_ctx.db
+
         try:
             query_params, sort_params = utils.distill_query_params(request)
         except Exception as e:
             self.notify_observers(utils.ModelState(valid=False, message=str(e), errors=[e]))
         else:
-            self.notify_observers(self._work_order_mapper.read(query_params=query_params, sort_params=sort_params))
+            model_state = self._work_order_mapper.read(query_params=query_params, sort_params=sort_params)
+            if not model_state.valid:
+                self.notify_observers(model_state)
+                return
+            og_msg = model_state.message
+            
+            # must have succesfully read some work orders
+            # also grab the pothole information associated with each one
+            data = []
+            for work_order in model_state.data:
+                model_state = self._pothole_mapper.read(query_params={'pothole_id': {'filter':'=', 'val':work_order.pothole_id}})
+                if not model_state.valid:
+                    # TODO: this shouldn't happen ever...right?
+                    self.notify_observers(model_state)
+                    return
+                pothole = model_state.data[0] # succesfully read a pothole, get it from the model state
+                work_order_dict = work_order.to_json() # jsonify work order
+                work_order_dict['pothole'] = pothole.to_json() # add new key:val pair for jsonified pothole
+                data.append(work_order_dict)
+
+            self.notify_observers(utils.ModelState(valid=True, message=og_msg, data=data))
 
 
 @register_service("update_work_order", data_mappers.WorkOrderMapper)
