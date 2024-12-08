@@ -57,8 +57,7 @@ class PotholeMapper(SQLiteDataMapper):
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
 
-    @staticmethod
-    def _check_invalid_fields(fields:list) -> list:
+    def _check_invalid_fields(self, fields:list) -> list:
         invalid_fields = [] # empty if all fields are valid
 
         for field in fields:
@@ -146,22 +145,11 @@ class PotholeMapper(SQLiteDataMapper):
         """
         Insert a new Pothole into the database
         """
-        query = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,
+        stmt = """INSERT INTO Potholes (street_addr,latitude,longitude,size,location,other_info,repair_status,
         repair_type,repair_priority,report_date,expected_completion,actual_completion) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"""
 
-        pothole_id = super()._exec_dml_command(query, args=pothole.to_tuple(incl_id=False), do_insert=True)
+        pothole_id = super()._exec_dml_command(stmt, args=pothole.to_tuple(incl_id=False), do_insert=True)
         pothole.pothole_id = pothole_id
-
-        query = """INSERT INTO WorkOrders (pothole_id,assignment_date,estimated_man_hours,actual_man_hours) VALUES (?,?,?,?)"""
-
-        # TODO Probably a better way to do this
-        record = {
-            "pothole_id": pothole_id,
-            "assignment_date": datetime.now(),
-            "estimated_man_hours": 1 if pothole.size < 3 else 3 if pothole.size < 7 else 5
-        }
-        work_order = entities.WorkOrder(**dict(record))
-        super()._exec_dml_command(query, args=work_order.to_tuple(incl_id=False))
 
         return utils.ModelState(valid=True, message=f"Successfully created new Pothole with id {pothole_id}", data=[pothole])
 
@@ -228,8 +216,7 @@ class WorkOrderMapper(SQLiteDataMapper):
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
 
-    @staticmethod
-    def _check_invalid_fields(fields:list) -> list:
+    def _check_invalid_fields(self, fields:list) -> list:
         invalid_fields = []
 
         for field in fields:
@@ -356,18 +343,12 @@ class WorkOrderMapper(SQLiteDataMapper):
             return_one=False,
             )
 
-        # TODO Probably a better way to do this
-        data = [dict(record) for record in records]
-        for work_order in data:
-            stmt = """SELECT pothole_id,street_addr,latitude,longitude,size,location,other_info,repair_status,
-            repair_type,repair_priority,report_date,expected_completion,actual_completion FROM Potholes WHERE pothole_id=?"""
-            record = super()._exec_dql_command(stmt, tuple(str(work_order["pothole_id"])), return_one=True)
-            work_order.update({"pothole": dict(record)})
+        work_orders = [entities.WorkOrder(**dict(record)) for record in records]
 
         return utils.ModelState(
             valid=True, 
-            message=f"Found {len(data)} Work Orders matching query",
-            data=data,
+            message=f"Found {len(work_orders)} Work Orders matching query", 
+            data=work_orders,
             )
     
     def update(self, query_params:dict, update_fields:dict):
@@ -404,15 +385,13 @@ class ReportMapper(SQLiteDataMapper):
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
 
-    @staticmethod
-    def _check_pothole_field(field:str) -> str | None:
+    def _check_pothole_field(self, field:str) -> str | None:
         if entities.Pothole.has_property(field):
             return field
 
         return None
 
-    @staticmethod
-    def _check_invalid_field(field:str) -> str | None:
+    def _check_invalid_field(self, field:str) -> str | None:
         if not (entities.WorkOrder.has_property(field) or entities.Pothole.has_property(field)):
             return field
 
