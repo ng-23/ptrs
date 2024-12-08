@@ -104,7 +104,7 @@ async function initMap() {
                         let actual_man_hours = document.querySelector("#actualManHours").value;
 
                         // If 'Actual Man-Hours' is not provided show alert and throw error
-                        if (actual_man_hours === "" && workOrder.pothole.repair_status === "not repaired") {
+                        if (actual_man_hours === "" && workOrder.pothole.repair_status === "not repaired" && repair_status !== "removed") {
                             alert("Please provide an input for 'Actual Man-Hours'");
                             throw new Error("User provided no input for 'Actual Man-Hours'");
                         }
@@ -128,7 +128,7 @@ async function initMap() {
                                     console.error("Error:", error);
                                 });
                             // Send update request of work order to server
-                            if (actual_man_hours !== "") {
+                            if (actual_man_hours !== "" && repair_status !== "removed") {
                                 fetch(`/api/work-order/?work_order_id=${workOrder.work_order_id}`, {
                                     method: "PATCH",
                                     headers: {
