@@ -1,5 +1,7 @@
 /**
  * Creates a control to recenter the map on Indiana County.
+ * @param map			Map object to add control button to
+ * @param myLatLng		Dictionary with latitude and longitude values used for click functionality of control button
  */
 function createCenterControl(map, myLatLng) {
 	const controlButton = document.createElement("button");
@@ -9,7 +11,7 @@ function createCenterControl(map, myLatLng) {
 	controlButton.title = "Recenter";
 	controlButton.type = "button";
 	controlButton.id = "homeButton";
-	// Setup the click event listeners: simply set the map to Indiana County.
+	// Set up the click event listeners: simply set the map to Indiana County.
 	controlButton.addEventListener("click", () => {
 		map.setCenter(myLatLng);
 		map.setZoom(10);
@@ -173,6 +175,7 @@ async function initMap() {
 			console.error("Error:", error);
 		});
 
+	// On submit form, post new pothole to server
 	const form = document.querySelector("#newPotholeForm");
 	form.addEventListener("submit", function (e) {
 		if (newPotholeAddress.address === "") {
@@ -207,5 +210,6 @@ async function initMap() {
 			});
 	});
 }
+
 
 window.initMap = initMap;

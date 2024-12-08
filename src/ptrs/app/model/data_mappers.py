@@ -394,7 +394,7 @@ class ReportMapper(SQLiteDataMapper):
 
     @staticmethod
     def _check_invalid_field(field:str) -> str | None:
-        if not (entities.WorkOrder.has_property(field) or entities.Pothole.has_property(field)):
+        if not (entities.WorkOrder.has_property(field) or entities.Pothole.has_property(field)): # TODO check for pothole entity doesn't work for whatever reason
             return field
 
         return None
@@ -419,6 +419,7 @@ class ReportMapper(SQLiteDataMapper):
                 raise exceptions.InvalidQueryParams({"message":f"{len(invalid_param)} is not a queryable field of Work Orders", "data":invalid_param})
             stmt += " AND ".join([f"{param}=?" for param in query_params])
 
+        # TODO probably a better way to do this
         pothole_field = self._check_pothole_field(list(sort_params.keys())[0])
         order = None
         if pothole_field is not None:
