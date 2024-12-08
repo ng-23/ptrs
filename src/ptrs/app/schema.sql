@@ -21,7 +21,7 @@ CREATE TABLE WorkOrders (
     work_order_id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
     pothole_id INTEGER NOT NULL UNIQUE,
     assignment_date DATETIME NOT NULL,
-    estimated_man_hours INTEGER NOT NULL,
-    actual_man_hours INTEGER,
+    estimated_man_hours FLOAT NOT NULL,
+    actual_man_hours FLOAT,
     FOREIGN KEY (pothole_id) REFERENCES Potholes (pothole_id)
 );

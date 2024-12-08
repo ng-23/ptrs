@@ -154,7 +154,7 @@ button {
     color: #ffffff;
 }
 
-/* Generate Report Popup */
+/* Popups */
 
 .popup {
     width: 350px;
@@ -184,8 +184,8 @@ button {
     vertical-align: middle;
 }
 
-.popup > select {
-    width: 250px;
+.popup > select,
+.popup > input[type=number]{
     height: 40px;
     margin-left: auto;
     float: right;
@@ -197,7 +197,8 @@ button {
     cursor: pointer;
 }
 
-.popup > select:focus {
+.popup > select:focus,
+.popup > input[type=number]:focus {
     outline: none;
 }
 
@@ -227,7 +228,6 @@ button {
 }
 
 .popup > input[type=submit] {
-    width: 175px;
     float: right;
     background-color: #007aff;
     color: #ffffff;
@@ -235,4 +235,21 @@ button {
 
 .popup > input[type=submit]:hover {
     background-color: #1e90ff;
+}
+
+.reportPopup > select {
+    width: 250px;
+}
+
+.reportPopup > input[type=submit] {
+    width: 175px;
+}
+
+.workOrderPopup > select,
+.workOrderPopup > input[type=number]{
+    width: 200px;
+}
+
+.workOrderPopup > input[type=submit] {
+    width: 100px;
 }

@@ -199,8 +199,8 @@ class WorkOrder(Entity):
             pothole_id: int,
             assignment_date: datetime,
             estimated_man_hours: int,
-            actual_man_hours: int | None = None,
-            work_order_id: int | None = None,
+            actual_man_hours: float | None = None,
+            work_order_id: float | None = None,
     ):
         self.work_order_id = work_order_id
         self.pothole_id = pothole_id
@@ -241,11 +241,11 @@ class WorkOrder(Entity):
         self._assignment_date = assignment_date
 
     @estimated_man_hours.setter
-    def estimated_man_hours(self, estimated_man_hours: int):
+    def estimated_man_hours(self, estimated_man_hours: float):
         self._estimated_man_hours = estimated_man_hours
 
     @actual_man_hours.setter
-    def actual_man_hours(self, actual_man_hours: int | None):
+    def actual_man_hours(self, actual_man_hours: float | None):
         self._actual_man_hours = actual_man_hours
 
     def to_tuple(self, incl_id=False):

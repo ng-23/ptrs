@@ -89,6 +89,13 @@ class ReadPotholes(View):
             else:
                 data["data"].append(item)
 
+        # TODO Fix
+        for pothole in data["data"]:
+            pothole["report_date"] = pothole["report_date"][:19]
+            pothole["expected_completion"] = pothole["expected_completion"][:10]
+            if pothole["actual_completion"] is not None:
+                pothole["actual_completion"] = pothole["actual_completion"][:10]
+
         return jsonify(**data), status
 
     def notify(self, model_state: ModelState):
@@ -167,6 +174,14 @@ class ReadWorkOrders(View):
             else:
                 data["data"].append(item)
 
+        # TODO Fix
+        for work_order in data["data"]:
+            work_order["pothole"]["report_date"] = work_order["pothole"]["report_date"][:19]
+            work_order["assignment_date"] = work_order["assignment_date"][:10]
+            work_order["pothole"]["expected_completion"] = work_order["pothole"]["expected_completion"][:10]
+            if work_order["pothole"]["actual_completion"] is not None:
+                work_order["pothole"]["actual_completion"] = work_order["pothole"]["actual_completion"][:10]
+
         return jsonify(**data), status
 
     def notify(self, model_state: ModelState):
@@ -219,7 +234,7 @@ class ReadReport(View):
             else:
                 data["data"].append(item)
 
-        # TODO Fix python converts these dates to strings
+        # TODO Fix
         for work_order in data["data"]:
             work_order["pothole"]["report_date"] = work_order["pothole"]["report_date"][:19]
             work_order["assignment_date"] = work_order["assignment_date"][:10]
