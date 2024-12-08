@@ -8,36 +8,48 @@
     <link href="https://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" />
 </head>
 <body>
-    <div class="buttonsDiv">
-        <button class="typeSelect activeButton">Active</button>
-        <button class="typeSelect completeButton">Completed</button>
-        <button class="generateReportButton">Generate Report</button>
-    </div>
-    <div class="gridContainer"></div>
-    <div class="popup" style="visibility: hidden; opacity: 0;">
-        <label for="sortBy">Sort By:</label>
-        <select id="sortBy">
-            <option value="work_order_id">Work Order ID</option>
-            <option value="pothole_id">Pothole ID</option>
-            <option value="report_date">Date of Report</option>
-            <option value="assignment_date">Date of Assignment</option>
-            <option value="size">Size</option>
-            <option value="repair_type">Repair Type</option>
-            <option value="repair_priority">Repair Priority</option>
-            <option value="repair_status">Repair Status</option>
-            <option value="estimated_man_hours">Estimated Man Hours</option>
-            <option value="actual_man_hours">Actual Man Hours</option>
-            <option value="expected_completion">Expected Completion Date</option>
-            <option value="actual_completion">Actual Completion Date</option>
-        </select>
-        <label for="order">Order:</label>
-        <select id="order">
-            <option value="ascending">Ascending</option>
-            <option value="descending">Descending</option>
-        </select>
-        <button class="cancel">Cancel</button>
-        <input type="submit" value="Generate Report">
-    </div>
+<div class="buttonsDiv">
+    <button class="typeSelect activeButton">Active</button>
+    <button class="typeSelect completeButton">Completed</button>
+    <button class="generateReportButton">Generate Report</button>
+</div>
+<div class="gridContainer"></div>
+<div class="reportPopup popup" style="visibility: hidden; opacity: 0;">
+    <label for="sortBy">Sort By:</label>
+    <select id="sortBy">
+        <option value="work_order_id">Work Order ID</option>
+        <option value="pothole_id">Pothole ID</option>
+        <option value="report_date">Date of Report</option>
+        <option value="assignment_date">Date of Assignment</option>
+        <option value="size">Size</option>
+        <option value="repair_type">Repair Type</option>
+        <option value="repair_priority">Repair Priority</option>
+        <option value="repair_status">Repair Status</option>
+        <option value="estimated_man_hours">Estimated Man-Hours</option>
+        <option value="actual_man_hours">Actual Man-Hours</option>
+        <option value="expected_completion">Expected Completion Date</option>
+        <option value="actual_completion">Actual Completion Date</option>
+    </select>
+    <label for="order">Order:</label>
+    <select id="order">
+        <option value="ascending">Ascending</option>
+        <option value="descending">Descending</option>
+    </select>
+    <button class="cancel">Cancel</button>
+    <input type="submit" value="Generate Report">
+</div>
+<div class="workOrderPopup popup" style="visibility: hidden; opacity: 0;">
+    <label for="repairStatus">Repair Status</label>
+    <select id="repairStatus">
+        <option value="repaired">Repaired</option>
+        <option value="temporarily repaired">Temporarily Repaired</option>
+        <option value="removed">Removed</option>
+    </select>
+    <label for="actualManHours">Actual Man-Hours</label>
+    <input type="number" id="actualManHours" min="0" step="0.5"/>
+    <button class="cancel">Cancel</button>
+    <input type="submit" value="Update">
+</div>
 <script type="module" src="{{ url_for('static', filename='work-orders.js') }}"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAs_wMRGpPPb74zD4Qf7FI_nE4cTR4JINw&loading=async&callback=initMap&v=weekly" defer></script>
 </body>

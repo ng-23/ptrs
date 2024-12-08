@@ -385,13 +385,15 @@ class ReportMapper(SQLiteDataMapper):
     def __init__(self, enable_foreign_keys=False):
         super().__init__(enable_foreign_keys=enable_foreign_keys)
 
-    def _check_pothole_field(self, field:str) -> str | None:
+    @staticmethod
+    def _check_pothole_field(field:str) -> str | None:
         if entities.Pothole.has_property(field):
             return field
 
         return None
 
-    def _check_invalid_field(self, field:str) -> str | None:
+    @staticmethod
+    def _check_invalid_field(field:str) -> str | None:
         if not (entities.WorkOrder.has_property(field) or entities.Pothole.has_property(field)):
             return field
 
