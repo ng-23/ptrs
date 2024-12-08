@@ -1,5 +1,5 @@
 from ptrs.app import views, database
-from ptrs.app.model import services, entities
+from ptrs.app.model import services
 from flask import request, g
 from flask.views import View
 from abc import ABC, abstractmethod
@@ -15,7 +15,7 @@ def register_controller(name: str, service: services.Service, view: views.View):
     def decorator(controller_class: Controller):
         if controller_class in registered_controllers:
             raise ValueError(f"Controller class {controller_class} is already registered to a name, Service, and View.")
-
+        
         registered_controllers[controller_class] = {
             "name": name,
             "service": service,
